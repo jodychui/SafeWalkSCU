@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+
+// To use default Database instance, we call instance on FirebaseDatabase
+FirebaseDatabase database = FirebaseDatabase.instance;
 
 void main() {
   runApp(const MyApp());
