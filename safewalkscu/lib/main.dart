@@ -1,7 +1,83 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:js';
 
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:safewalkscu/firebase_options.dart';
+import 'firebase_options.dart';
+
+// To use default Database instance, we call instance on FirebaseDatabase
+FirebaseDatabase database = FirebaseDatabase.instance;
+
+/* Dummy tokens */
+const userToken = ['a', 'b', 'c'];
+
+/* Database ref path to /user/ */
+DatabaseReference user = FirebaseDatabase.instance.ref("user/${userToken[0]}");
+
+/* Database ref path to /admins/ */
+DatabaseReference admins = FirebaseDatabase.instance.ref("admins");
+
+Future<void> main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.web,
+  );
+
   runApp(const MyApp());
+
+  /* time */
+  final now = DateTime.now();
+
+  final jsonEncoder = JsonEncoder();
+
+  /* Create student obj - Checking in*/
+  var student = {
+    "name": "John",
+    "age": 18,
+    "address": {"line1": "100 Mountain View"},
+    "checkInTime": {
+      "date": {
+        "month": now.month.toString(),
+        "day": now.day.toString(),
+        "year": now.year.toString(),
+      },
+      "time": {
+        "hour": now.hour.toString(),
+        "minute": now.minute.toString(),
+      }
+    },
+  };
+
+  /* Checking out */
+  var checkOutLog = {
+    "date": {
+      "month": now.month.toString(),
+      "day": now.day.toString(),
+      "year": now.year.toString(),
+    },
+    "time": {
+      "hour": now.hour.toString(),
+      "minute": now.minute.toString(),
+    }
+  };
+
+  student['checkOutTime'] = checkOutLog;
+
+  print(student);
+
+
+  /* Replaces any specified reference */
+  await user.set(student);
+
+  /* Updates the age prop 'age' to 21 */
+  await user.update({
+    "age": 21,
+  });
+
+
+  /* Reading data from database */
+  
 }
 
 class MyApp extends StatelessWidget {
