@@ -16,7 +16,7 @@ import {
   GoogleAuthProvider,
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
 
-import {Student} from "./classes.js";
+import {student} from "./classes.js";
 
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -107,11 +107,10 @@ function createUserData(id, name, email , phoneNumber, addressL1, addressL2){
 const userToken = ["a", "b", "c"];
 
 async function main() {
-  const student = new Student(userToken[0], 'sam','xxx@scu.edu', '123123122','123 NY NY');
+  const studentObj = student(userToken[0], 'sam','xxx@scu.edu', '123123122','123 NY NY');
+  
+  console.log(studentObj);
 
-  console.log(student.getCheckInTime());
-  student.setCheckInTime();
-  console.log(student.getCheckInTime());
 
 
   // writeUserData("a", "sam", "asdf@gmail.com", "str", checkInTime());
