@@ -17,7 +17,7 @@ const firebaseConfig = {
 
 const student = {
   name : 'name',
-  addWalk
+  addWalker : function(a)
 
 }
 
