@@ -8,6 +8,8 @@ import {
   getDatabase,
   ref,
   set,
+  child,
+  get
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js";
 /* For login */
 import {
@@ -61,58 +63,62 @@ signInWithPopup(auth, provider)
 const db = getDatabase();
 // const userId = auth.currentUser.uid;
 
-/* Database ref path to /user/ */
-
-/* Database ref path to /admins/ */
-/* Not needed for admin page */
-function writeUserData(userData) {
+/* Not needed for admin page. Takes student object and writes to the 
+   database. The date is stored as a string. */
+function writeUserData(student) {
   const db = getDatabase();
-  set(ref(db, "users/" + userId), {
-    name: userData.name,
-    email: userData.email,
-    checkIn: {
-      hour: userData.hour,
-      minute: userData.minute,
+  set(ref(db, "users/" + student.token), {
+    name: student.name,
+    email: student.email,
+    phoneNumber: student.phoneNumber,
+    addressL1: student.addressL1,
+    addressL2: student.addressL2,
+    checkInTime: {
+      dateObj: student.checkInTime.dateObj.toString(),
+      hour: student.checkInTime.hour,
+      minute: student.checkInTime.minute,
     },
+    checkOutTime: {
+      dateObj: student.checkOutTime.dateObj.toString(),
+      hour: student.checkInTime.hour,
+      minute: student.checkInTime.minute,
+    }
   });
 }
 
-/* For walkers.
-   Records the check in time
-Uses Google login token for ID.*/
-function checkInTime (id) {
-  const now = new Date();
-  const obj = {
-    hour: now.getHours(),
-    minute: now.getMinutes(),
-  }
-  return obj;
-};
-
-/* Generates initial user data */
-function createUserData(id, name, email , phoneNumber, addressL1, addressL2){
-  const obj = {
-    id: id, /* temporary */
-    email: email,
-    name: name,
-    phoneNumber: phoneNumber,
-    addressL1: addressL1,
-    addressL2: addressL2,
-  }
-  return obj;
-}
-
-
 
 const userToken = ["a", "b", "c"];
+
+
+// get(db, `users/${userToken[0]}`).then((snapshot)=> {
+//   if (snapshot.exists()) {
+//     console.log(snapshot.val());
+    
+    
+//   } else {
+//     console.log('no data');
+//   }
+// }).catch((error) => {
+//   console.error(error);
+// })
 
 async function main() {
   const studentObj = student(userToken[0], 'sam','xxx@scu.edu', '123123122','123 NY NY');
   
   console.log(studentObj);
+  studentObj.setCheckInTime();
 
+  console.log(studentObj.checkInTime.dateObj.toString());
 
+  setTimeout ( () => {
+    studentObj.setCheckOutTime();
+    console.log(studentObj.checkOutTime.dateObj.toString());
+  
+    console.log(studentObj.getElapsedTime().toString());
 
-  // writeUserData("a", "sam", "asdf@gmail.com", "str", checkInTime());
+    
+  },5000)  
+  // writeUserData(studentObj);
+  
 }
 main();

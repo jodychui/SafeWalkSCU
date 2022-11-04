@@ -16,30 +16,36 @@ function student(
   addressL2 = " "
 ) {
   const obj = {
-    token: token,
-    name: name,
-    email: email,
-    phoneNumber: phoneNumber,
-    addressL1: addressL1,
-    addressL2: addressL2,
-    checkInTime: {
-      hour: 0,
-      minute: 0,
-    },
+   
     setCheckInTime() {
       const d = new Date();
       const obj = {
+        dateObj: d,           /* In case we need to perform date 
+                                 arithmetics, such as getElapsedTime() */
         hour: d.getHours(),
         minute: d.getMinutes(),
       };
+      
+      this.checkInTime = obj;
     },
     setCheckOutTime() {
       const d = new Date();
       const obj = {
+        dateObj: d,
         hour: d.getHours(),
         minute: d.getMinutes(),
       };
       this.checkOutTime = obj;
+    },
+    /* Calculate the difference in time, returns the difference in minutes */
+    getElapsedTime () {
+      if (this.checkInTime === undefined || this.checkOutTime === undefined){
+        console.log('Please set the checkin/checkout time first');  
+        return;
+      }
+      const difference = Math.abs(this.checkInTime.dateObj - this.checkOutTime.dateObj);
+      
+      return difference / 60000;
     },
     /* fields */
     token,
@@ -48,7 +54,16 @@ function student(
     phoneNumber,
     addressL1,
     addressL2,
-    checkOutTime: {},
+    checkInTime: {
+      dateObj: new Date(),
+      hour: 0,
+      minute: 0,
+    },
+    checkOutTime: {
+      dateObj: new Date(),
+      hour: 0,
+      minute: 0,
+    }
   };
   return obj;
 }
