@@ -68,4 +68,16 @@ function student(
   return obj;
 }
 
+
+function walker() {
+  let obj = student();
+  const walker = {
+    onDuty: false,
+  
+  }
+  
+  return obj;
+}
+
+
 export { student };
