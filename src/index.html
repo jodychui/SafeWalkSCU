@@ -18,12 +18,65 @@
     <script src="classes.js" async defer></script>
     <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
 
+
+
 </head>
 
 <body>
     <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
+    <div class="container-fluid overflow-hidden">
+        <div class="row vh-100 overflow-auto">
+            <div class="col-12 col-sm-3 col-xl-2 px-sm-2 px-0 bg-light d-flex sticky-top">
+                <div
+                    class="d-flex flex-sm-column flex-row flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 text-white">
+                    <a href="/"
+                        class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                        <span class="fs-5"><span class="logo d-none
+                                d-sm-inline"><img src="assets/logos/logo_transparent.png"
+                                    alt="Safe Walk logo image"></span></span>
+                    </a>
+                    <ul class=" nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0
+                                    flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center
+                                    align-items-sm-start" id="menu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link px-sm-0 px-2">
+                                <i class="fs-5 bi-request"></i><span class="ms-1 d-none d-sm-inline">Requests</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link px-sm-0 px-2">
+                                <i class="fs-5 bi-walkers"></i><span class="ms-1 d-none d-sm-inline">Walkers</span></a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link px-sm-0 px-2">
+                                <i class="fs-5 bi-chat"></i><span class="ms-1 d-none d-sm-inline">Chat</span></a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link px-sm-0 px-2">
+                                <i class="fs-5 bi-settings"></i><span class="ms-1 d-none d-sm-inline">Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link px-sm-0 px-2">
+                                <i class="fs-5 bi-logout"></i><span class="ms-1 d-none d-sm-inline">Log
+                                    Out</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col d-flex flex-column h-sm-100">
+                <main class="row overflow-auto">
+
+                </main>
+                <footer class="row py-4 mt-auto">
+
+                </footer>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap JavaScript, supposed to be at end -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

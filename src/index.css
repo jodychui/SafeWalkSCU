@@ -1,0 +1,16 @@
+@media screen and (min-width: 48em) {
+    .logo img {
+        max-width: 100%;
+    }
+}
+
+body {
+    background-color: #F4F2F0;
+}
+
+.logo img {
+    /* display: inline-block; */
+    max-height: 100%;
+    margin: auto auto;
+    /* width: auto; */
+}
