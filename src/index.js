@@ -6,13 +6,6 @@
  *
  */
 
-/**
- * @file index.js
- * @brief Mainly the database operations will be performed here, such
- * as retrieving user (walkee) data and updating them.
- *
- */
-
 // Import the functions you need from the SDKs you need
 // import { initializeApp } from 'firebase/app';
 // import { getDatabase } from 'firebase/database';
@@ -34,6 +27,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
 
 import { user } from "./classes.js";
+// import the walker object here!
+
 const firebaseConfig = {
   apiKey: "AIzaSyD4ER15Ypc7TCAXGlt_1tvmXEuLpXal14k",
   authDomain: "safewalkscu.firebaseapp.com",
@@ -46,7 +41,6 @@ const firebaseConfig = {
 
 /**
  *  @brief Initializes the firebase application.
- *
  *  @const auto
  *
  * */
@@ -57,7 +51,7 @@ const db = getDatabase();
 // const userId = auth.currentUser.uid;
 
 /**
- * @const
+ * @brief All global constants that are required for the functions.
  *
  */
 const MAX_WALKER_COUNT = 5;
@@ -68,6 +62,7 @@ const dbRef = ref(getDatabase());
 let userData;
 
 
+
 /**
  * @function getUserData
  * @brief Asynchronously retrieves user info from the database from /users
@@ -76,7 +71,18 @@ let userData;
  *
  * */
 function getUserData() {
+  /* This creates a new promise object which can be either be resolved
+     or rejected. In this case promise is resolved if the data from the 
+     server is found. If the data is found, the anonymous callback 
+     function will resolve the promise with the data and pass it as a
+     parameter in Promise.prototype.then().
+     If a promise fails, then it will skip the .then and go to .catch. */
   let userData = new Promise(function (resolve, reject) {
+    /* The get() is a firebase function which takes in two params.
+       1. the databaseReference 
+       2. the path where the database is located. The child() will 
+          give us the subpath of /users/<this>. 
+     */
     return get(child(dbRef, `users`))
       .then((snapshot) => {
         if (snapshot.exists()) {
@@ -90,12 +96,14 @@ function getUserData() {
             }
             i++;
           });
+          /* Promise is resolved here.  */
           resolve(arr);
         } else {
           console.log("No data available");
         }
       })
       .catch((error) => {
+        /* Promise has failed at this point, so it will throw an error.  */
         console.error(error);
       });
   });
@@ -104,11 +112,14 @@ function getUserData() {
    * */
   userData.then(function (data) {
     /* Do stuff here with the data. */
+
     console.log(data);
 
     return data;
   });
 }
+
+
 
 /**
  * @function writeUserData
@@ -117,6 +128,9 @@ function getUserData() {
  * database path `/users/<authorizationToken>`.
  * */
 function writeUserData(user) {
+  /* Whenever we're writing we need to get the reference to the 
+     database, and we can do so initializing it with a getDatabase() method.
+  */
   const db = getDatabase();
   set(ref(db, `users/${user.assigned ? 'assigned': 'unassigned'}/`
                      + userToken[1]), {
@@ -126,7 +140,7 @@ function writeUserData(user) {
     addresses:{
       srcAddressL1: user.addresses.srcAddressL1,
       srcAddressL2: user.addresses.srcAddressL2,
-      dstAddressL1: user.addresses.dstAddressL2,
+      dstAddressL1: user.addresses.dstAddressL1,
       dstAddressL2: user.addresses.dstAddressL2,
     },
     checkInTime: {
@@ -148,7 +162,6 @@ function writeUserData(user) {
  * @brief Takes user (walker) object and writes to the database in
  * database path `/walkers/<authorizationToken>`.
  * */
-
 function writeWalkerData(user) {
   const db = getDatabase();
   set(ref(db, "walkers/" + walkerToken[1]), {
@@ -178,12 +191,18 @@ function writeWalkerData(user) {
 
 /**
  *  @function signIn
- *  @param {FirebaseAuth} auth Firebase authentication object
- *  @param {GoogleAuthProvider} provider Utility class for constructing
- *                              Google Sign In credentials.
- *  @brief Grants authorization to log in using Google credentials.
- *  */
+ *  @brief calls firebase's signInWithPopup method. 
+ * */
 function signIn() {
+    /**
+   *  @function signInWithPopup
+   *  @param {FirebaseAuth} auth 
+   *    Firebase authentication object
+   *  @param {GoogleAuthProvider} provider 
+   *    Utility class for constructing
+   *    Google Sign In credentials.
+   *  @brief Calls  authorization to log in using Google credentials. 
+   *  */
   signInWithPopup(auth, provider)
     .then((result) => {
       // This gives you a Google Access Token. You can use it to access the Google API.
@@ -214,14 +233,17 @@ async function main() {
   /* getUserData is async. That means userData will be undefined
      until the data is completely retrieved. */
   // userData = getUserData();
-  const user1 = user(userToken[0],'james','xxx@scu.edu','33333332', 't', 't', 't', 't');
-  user1.assigned = true;
-  console.log(user1);
-  writeUserData(user1);
-  user1.assigned = false;
-  writeUserData(user1);
-  
+  // const user1 = user(userToken[0],'james','xxx@scu.edu','33333332', 't', 't', 't', 't');
+  // user1.assigned = true;
+  // console.log(user1);
+  // writeUserData(user1);
+  // user1.assigned = false;
+  // writeUserData(user1);
+
+  // userData = getUserData();
+  console.log(userData);
 }
 
-main();
+// main();
+
 
