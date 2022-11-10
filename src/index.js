@@ -1,14 +1,15 @@
 /**
  * @file index.js
- * @brief Mainly the database operations will be performed here, such as
- *        retrieving user (walkee) data and updating them.
+ * @author 
+ * @brief Mainly the database operations will be performed here, such
+ * as retrieving user (walkee) data and updating them.
  *
  */
 
 /**
  * @file index.js
- * @brief Mainly the database operations will be performed here, such as
- *        retrieving user (walkee) data and updating them.
+ * @brief Mainly the database operations will be performed here, such
+ * as retrieving user (walkee) data and updating them.
  *
  */
 
@@ -52,7 +53,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-
 const db = getDatabase();
 // const userId = auth.currentUser.uid;
 
@@ -65,7 +65,7 @@ const userToken = ["a", "b", "c"];
 const adminToken = ["d"];
 const walkerToken = ["e"];
 const dbRef = ref(getDatabase());
-let studentData;
+let userData;
 
 
 /**
@@ -76,7 +76,7 @@ let studentData;
  *
  * */
 function getUserData() {
-  let studentData = new Promise(function (resolve, reject) {
+  let userData = new Promise(function (resolve, reject) {
     return get(child(dbRef, `users`))
       .then((snapshot) => {
         if (snapshot.exists()) {
@@ -102,7 +102,7 @@ function getUserData() {
   /**
    * Upon a resolved promise, the array of students
    * */
-  studentData.then(function (data) {
+  userData.then(function (data) {
     /* Do stuff here with the data. */
     console.log(data);
 
@@ -118,12 +118,17 @@ function getUserData() {
  * */
 function writeUserData(user) {
   const db = getDatabase();
-  set(ref(db, "users/" + userToken[1]), {
+  set(ref(db, `users/${user.assigned ? 'assigned': 'unassigned'}/`
+                     + userToken[1]), {
     name: user.name,
     email: user.email,
     phoneNumber: user.phoneNumber,
-    srcAddressL1: user.srcAddressL1,
-    srcAddressL2: user.srcAddressL2,
+    addresses:{
+      srcAddressL1: user.addresses.srcAddressL1,
+      srcAddressL2: user.addresses.srcAddressL2,
+      dstAddressL1: user.addresses.dstAddressL2,
+      dstAddressL2: user.addresses.dstAddressL2,
+    },
     checkInTime: {
       dateObj: user.checkInTime.dateObj.toString(),
       hour: user.checkInTime.hour,
@@ -150,6 +155,8 @@ function writeWalkerData(user) {
     name: user.name,
     email: user.email,
     phoneNumber: user.phoneNumber,
+    assigned: user.assigned,
+    pairedWith: user.pairedWith,
     addresses: {
       srcAddressL1: user.addresses.srcAddressL1,
       srcAddressL2: user.addresses.srcAddressL2,
@@ -203,40 +210,18 @@ function signIn() {
  * @brief The main driver of the page...
  *  */
 async function main() {
-  signIn();
-  /* getUserData is async. That means studentData will be undefined
+  // signIn();
+  /* getUserData is async. That means userData will be undefined
      until the data is completely retrieved. */
-  studentData = getUserData();
+  // userData = getUserData();
+  const user1 = user(userToken[0],'james','xxx@scu.edu','33333332', 't', 't', 't', 't');
+  user1.assigned = true;
+  console.log(user1);
+  writeUserData(user1);
+  user1.assigned = false;
+  writeUserData(user1);
+  
 }
 
-// main();
+main();
 
-/**
- *  @function signIn
- *  @param {FirebaseAuth} auth Firebase authentication object
- *  @param {GoogleAuthProvider} provider Utility class for constructing
- *                              Google Sign In credentials.
- *  @brief Grants authorization to log in using Google credentials.
- *  */
-function signIn() {
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      // The signed-in user info.
-      const user = result.user;
-      // ...
-      console.log(user);
-    })
-    .catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.customData.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
-    });
-}

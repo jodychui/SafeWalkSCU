@@ -7,7 +7,7 @@ Admin should be able to store  */
     }
     */
 
-function user(token, name, email, phoneNumber, srcAddressL1, srcAddressL2 = '', dstAddressL1, dstAddressL2 ='' ) {
+function user(token, name, email, phoneNumber, srcAddressL1, srcAddressL2 = ' ', dstAddressL1, dstAddressL2 =' ' ) {
   const obj = {
     setCheckInTime() {
       const d = new Date();
@@ -46,11 +46,13 @@ function user(token, name, email, phoneNumber, srcAddressL1, srcAddressL2 = '', 
     name,
     email,
     phoneNumber,
+    assigned: true,
+    pairedWith: ' ',
     addresses: {
-      srcAddressL1: '',
-      srcAddressL2: '',
-      dstAddressL1: '',
-      dstAddressL2: '',
+      srcAddressL1: srcAddressL1,
+      srcAddressL2: srcAddressL2,
+      dstAddressL1: dstAddressL1,
+      dstAddressL2: dstAddressL2,
     },
     checkInTime: {
       dateObj: new Date(),
