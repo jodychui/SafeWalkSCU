@@ -1,3 +1,8 @@
+* {
+    font-size: 100%;
+    font-family: 'Inter';
+}
+
 @media screen and (min-width: 48em) {
     .logo img {
         max-width: 100%;
@@ -13,4 +18,12 @@ body {
     max-height: 100%;
     margin: auto auto;
     /* width: auto; */
+}
+
+tbody {
+    background-color: white;
+}
+
+flex-column {
+    padding: 10px 0;
 }
