@@ -8,15 +8,14 @@ Admin should be able to store  */
     */
 
 function student(
-  token,
-  name,
-  email,
-  phoneNumber,
-  addressL1,
+  token, 
+  name, 
+  email, 
+  phoneNumber, 
+  addressL1, 
   addressL2 = " "
-) {
+  ) {
   const obj = {
-   
     setCheckInTime() {
       const d = new Date();
       const obj = {
@@ -48,12 +47,12 @@ function student(
       return difference / 60000;
     },
     /* fields */
-    token,
-    name,
-    email,
-    phoneNumber,
-    addressL1,
-    addressL2,
+    token: token,
+    name: name,
+    email: email,
+    phoneNumber: phoneNumber,
+    addressL1: addressL1, //initializing 
+    addressL2: addressL1,
     checkInTime: {
       dateObj: new Date(),
       hour: 0,
