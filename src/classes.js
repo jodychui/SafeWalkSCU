@@ -62,7 +62,10 @@ function user(
   };
   /* fields */
   this.assigned = true;
-  this.pairedWith = " ";
+  this.pairedWalkers= {
+    walker1 :'',
+    walker2: '',
+  };
   this.checkInTime = {
       dateObj: new Date(),
       hour: 0,
@@ -73,6 +76,11 @@ function user(
     hour: 0,
     minute: 0,
   };
+  this.timeElapsed = {
+    dateObj: new Date(),
+    hour: 0,
+    minute: 0,
+  }
 }
 
 export { user };

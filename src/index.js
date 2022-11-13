@@ -15,14 +15,14 @@
 // import { getDatabase } from 'firebase/database';
 // import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 /* Using browser modules for now... please do not delete above */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js";
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js';
 import {
   getDatabase,
   ref,
   set,
   child,
   get,
-} from "https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js";
+} from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js';
 /* For login */
 import {
   getAuth,
@@ -120,6 +120,8 @@ function getUserData() {
 
     console.log(typeof(data));
     console.log(data);
+    fillNewReqTable(data);
+    fillPendingReqTable(data);
     return data;
   });
 }
@@ -138,7 +140,7 @@ function writeUserData(user) {
   */
   const db = getDatabase();
   set(ref(db, `users/${user.assigned ? 'assigned': 'unassigned'}/`
-                     + userToken[1]), {
+                     + userToken[0]), {
     name: user.name,
     email: user.email,
     phoneNumber: user.phoneNumber,
@@ -158,6 +160,10 @@ function writeUserData(user) {
       hour: user.checkInTime.hour,
       minute: user.checkInTime.minute,
     },
+    pairedWalkers: {
+      walker1: user.pairedWalkers.walker1,
+      walker2: user.pairedWalkers.walker2,
+    },
   });
 }
 
@@ -169,7 +175,7 @@ function writeUserData(user) {
  * */
 function writeWalkerData(user) {
   const db = getDatabase();
-  set(ref(db, "walkers/" + walkerToken[1]), {
+  set(ref(db, 'walkers/' + walkerToken[2]), {
     name: user.name,
     email: user.email,
     phoneNumber: user.phoneNumber,
@@ -238,58 +244,109 @@ async function main() {
   /* getUserData is async. That means userData will be undefined
      until the data is completely retrieved. */
   // userData = getUserData();
-  const user1 = new user(userToken[0],'james','xxx@scu.edu','33333332', 't', 't', 't', 't');
-  console.log('the user: ', user1);
-  
-  // fillTable(user1);
-  // user1.assigned = true;
+  // const user1 = new user(userToken[0], 'Jodi','Jodi@scu.edu',
+  //                 '3234233423', '254 Villas Ave', '','324 Villa Rd', '' );
   // console.log(user1);
   // writeUserData(user1);
-  // user1.assigned = false;
-  // writeUserData(user1);
-
-  // userData = getUserData();
-  // console.log(userData);
+  
+  // getUserData();
+    
+  
 }
 
 main();
 
 /**
  * @function fillTable
- * @param { user } data
+ * @param { user } data 
  * @brief fills the tables in the requests page (index.html).
- *        This function should be called by 
+ *        This function should be called by the fill table.
+ *        Note that the data is an array of two objects.
+ *        1. Assigned user objs and 2. Unassigned user objs.
  * */
-function fillTable(data){
+function fillNewReqTable(data){
   /* 1. First, create a table row and create a reference to the tbody.*/
   const tbody = document.querySelector('.new-requests>tbody');
-  const firstRow = document.querySelector('tbody>tr');
+  const firstRow = tbody.children[0];
 
   /* 2. Make dynamic copies of the row that is empty and append them to
         the tbody as a child. */
-  for( child of firstRow){
-    child.textContent = '';
+  const dataSize = Object.keys(data[0]).length;
+  for( /* const child of firstRow.children */
+      let i = 0; i < 4; i++){
+    firstRow.children[i].textContent = '';
   }
-
+  console.log(dataSize);
   /* 3. Create data's number of rows. */
-  for (d of data) {
+  for (let i = 0; i < dataSize - 1; i++) {
     const newRow = firstRow.cloneNode(true);
     tbody.appendChild(newRow);
   }
   /* 3. Iterate through the userDataObjs, append new texts to the new 
-        empty rows, then append them as children. */
-  for (child of ){
-    newRow.childNodes[0].textContent = data.checkInTime.hour 
-                               + ':' + data.checkInTime.minute;
-    newRow.childNodes[1].textContent = data.name;
-    newRow.childNodes[2].textContent = data.addresses.srcAddressL1 +
-                                       data.addresses.dstAddressL2;
-    newRow.childNodes[3].textContent = data.pairedWith;
-    /* create a new row */
-    
+        empty rows, then append them as children.
+        We can access the unassigned users by iterating through 
+        each keys of the first element of our student object array.
+        */
+  console.log(Object.values(data[0]));
+  let i = 0;
+  for (const tr of tbody.children){
+    const user = Object.values(data[0])[i++];
+    tr.children[0].textContent = trailingZeroes(user.checkInTime.hour, 2)
+                                + ':' + trailingZeroes(user.checkInTime.
+                                  minute, 2);
+    tr.children[1].textContent = user.name;
+    tr.children[2].textContent = user.addresses.srcAddressL1 + ' '
+                                  user.addresses.srcAddressL2;
+    tr.children[3].textContent = user.addresses.dstAddressL1 + ' '
+                                  user.addresses.dstAddressL2;
   }
-    
 }
-  /* Copy the first node */
-  
 
+
+/**
+ * @function fillPendingReqTable
+ * @param { user } data 
+ * @brief fills the tables in the requests page (index.html).
+ *        This function should be called by the fill table.
+ *        Note that the data is an array of two objects.
+ *        1. Assigned user objs and 2. Unassigned user objs.
+ * */
+ function fillPendingReqTable(data){
+  const tbody = document.querySelectorAll('.new-requests>tbody')[1];
+  const firstRow = tbody.children[0];
+  const dataSize = Object.keys(data[1]).length;
+  for( let i = 0; i < 4; i++){
+    firstRow.children[i].textContent = '';
+  }
+  for (let i = 0; i < dataSize - 1; i++) {
+    const newRow = firstRow.cloneNode(true);
+    tbody.appendChild(newRow);
+  }
+  let i = 0;
+  for (const tr of tbody.children){
+    const user = Object.values(data[1])[i++];
+    tr.children[0].textContent = trailingZeroes(user.checkInTime.hour, 2)
+                                + ':' + trailingZeroes(user.checkInTime.
+                                  minute, 2);
+    tr.children[1].textContent = user.name;
+    tr.children[2].textContent = user.addresses.dstAddressL1 + ' '
+                                  user.addresses.dstAddressL2;
+    tr.children[3].textContent = user.pairedWalkers.walker1 + ' & ' 
+                               + user.pairedWalkers.walker2;
+    tr.children[4].textContent = 'TODO';
+  }
+}
+  
+/**
+ * @param {Number} number 
+ * @param {Number} howMany 
+ * @returns The newly created string of the given {number} to 
+ *          {howMany} decimal places.
+ */
+function trailingZeroes(number, howMany){
+  const str = number.toLocaleString('en-US', {
+    minimumIntegerDigits: howMany,
+    useGrouping: false
+  })
+  return str;
+}
