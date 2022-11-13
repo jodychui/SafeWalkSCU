@@ -2,8 +2,12 @@
  * @file index.js
  * @author 
  * @brief Mainly the database operations will be performed here, such
- * as retrieving user (walkee) data and updating them.
- *
+ *        as retrieving user (walkee) data and updating them. 
+ *        Will be primarily responsible for performing the following actions
+ *        within the Requests page:
+ *        1. Retrieving data and writing data onto New Requests 
+ *           and Current Requests tables.
+ *        2. Update and delete users.
  */
 
 // Import the functions you need from the SDKs you need
@@ -61,8 +65,6 @@ const walkerToken = ["e"];
 const dbRef = ref(getDatabase());
 let userData;
 
-
-
 /**
  * @function getUserData
  * @brief Asynchronously retrieves user info from the database from /users
@@ -111,7 +113,9 @@ function getUserData() {
    * Upon a resolved promise, the array of students
    * */
   userData.then(function (data) {
-    /* Do stuff here with the data. */
+    /* //// Do stuff here with the data.
+       //// Call fillTable() here. 
+    */
 
     console.log(data);
 
@@ -158,7 +162,7 @@ function writeUserData(user) {
 
 /**
  * @function writeWalkerData
- * @param {user}
+ * @param {user} user
  * @brief Takes user (walker) object and writes to the database in
  * database path `/walkers/<authorizationToken>`.
  * */
@@ -233,7 +237,9 @@ async function main() {
   /* getUserData is async. That means userData will be undefined
      until the data is completely retrieved. */
   // userData = getUserData();
-  // const user1 = user(userToken[0],'james','xxx@scu.edu','33333332', 't', 't', 't', 't');
+  
+  const user1 = new user(userToken[0],'james','xxx@scu.edu','33333332', 't', 't', 't', 't');
+  console.log('the user: ', user1);
   // user1.assigned = true;
   // console.log(user1);
   // writeUserData(user1);
@@ -241,9 +247,25 @@ async function main() {
   // writeUserData(user1);
 
   // userData = getUserData();
-  console.log(userData);
+  // console.log(userData);
 }
 
-// main();
+main();
+
+/**
+ * @function fillTable
+ * @param { user } userData
+ * @brief fills the tables in the requests page (index.html).
+ *        This function should be called by 
+ * 
+ * */
+function fillTable(userData){
+  /* First, create a table row */
+  const tbody = document.querySelector('.new-requests>tbody');
+  const firstRow = document.querySelector('tbody>tr');
+  /* Copy the first node */
+  const secondRow = firstRow.cloneNode(true);
+  
+}
 
 
