@@ -31,6 +31,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
 
 import { user } from "./classes.js";
+import { walker } from "./walker.js";
 // import the walker object here!
 
 const firebaseConfig = {
@@ -163,33 +164,22 @@ function writeUserData(user) {
 /**
  * @function writeWalkerData
  * @param {user} user
+ * @var assigned shows if user is assigned to a walker
  * @brief Takes user (walker) object and writes to the database in
  * database path `/walkers/<authorizationToken>`.
  * */
-function writeWalkerData(user) {
-  const db = getDatabase();
-  set(ref(db, "walkers/" + walkerToken[1]), {
-    name: user.name,
-    email: user.email,
-    phoneNumber: user.phoneNumber,
-    assigned: user.assigned,
-    pairedWith: user.pairedWith,
-    addresses: {
-      srcAddressL1: user.addresses.srcAddressL1,
-      srcAddressL2: user.addresses.srcAddressL2,
-      dstAddressL1: user.addresses.dstAddressL1,
-      dstAddressL2: user.addresses.dstAddressL2,
-    },
-    checkInTime: {
-      dateObj: user.checkInTime.dateObj.toString(),
-      hour: user.checkInTime.hour,
-      minute: user.checkInTime.minute,
-    },
-    checkOutTime: {
-      dateObj: user.checkOutTime.dateObj.toString(),
-      hour: user.checkInTime.hour,
-      minute: user.checkInTime.minute,
-    },
+function writeWalkerData(walker) {
+  const db = getDatabase();//get reference to database
+  set(ref(db, `walkers/${walker.onWalk ? 'unavailable' : 'available'}/` + walkerToken[0]), {
+    token: walker.token,
+    name: walker.name,
+    email: walker.email,
+    phoneNumber: walker.phoneNumber,
+    available: walker.onDuty && !walker.onWalk,//!!check this
+    unavailable: !walker.onDuty || walker.onWalk,
+    pairedWith: walker.pairedWith,
+    currentLocation: walker.currentLocation,
+    completedWalk: walker.completedWalk
   });
 }
 
@@ -238,8 +228,13 @@ async function main() {
      until the data is completely retrieved. */
   // userData = getUserData();
   
-  const user1 = new user(userToken[0],'james','xxx@scu.edu','33333332', 't', 't', 't', 't');
+  //example: create user object 
+  const user1 = new user(userToken[0],'james','xxx@scu.edu','6263333333', 't', 't', 't', 't');
   console.log('the user: ', user1);
+  const walker1 = new walker(userToken[0],'sam','xxxxx@scu.edu','6501112222',true,true,'500 El Camino Real, Santa Clara, CA, 94065', false);
+  console.log('the walker: ', walker1);
+  //writeWalkerData(walker1);// COMMENT AFTER RUNNING TO SAVE QUOTA!!!!!
+  
   // user1.assigned = true;
   // console.log(user1);
   // writeUserData(user1);
