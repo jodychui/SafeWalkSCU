@@ -28,19 +28,19 @@ import {
   getAuth,
   signInWithPopup,
   GoogleAuthProvider,
-} from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
+} from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js';
 
-import { user } from "./classes.js";
+import { user } from './classes.js';
 // import the walker object here!
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD4ER15Ypc7TCAXGlt_1tvmXEuLpXal14k",
-  authDomain: "safewalkscu.firebaseapp.com",
-  databaseURL: "https://safewalkscu-default-rtdb.firebaseio.com",
-  projectId: "safewalkscu",
-  storageBucket: "safewalkscu.appspot.com",
-  messagingSenderId: "558548226148",
-  appId: "1:558548226148:web:01051d9600a5174e9ecf71",
+  apiKey: 'AIzaSyD4ER15Ypc7TCAXGlt_1tvmXEuLpXal14k',
+  authDomain: 'safewalkscu.firebaseapp.com',
+  databaseURL: 'https://safewalkscu-default-rtdb.firebaseio.com',
+  projectId: 'safewalkscu',
+  storageBucket: 'safewalkscu.appspot.com',
+  messagingSenderId: '558548226148',
+  appId: '1:558548226148:web:01051d9600a5174e9ecf71',
 };
 
 /**
@@ -59,9 +59,9 @@ const db = getDatabase();
  *
  */
 const MAX_WALKER_COUNT = 5;
-const userToken = ["a", "b", "c"];
-const adminToken = ["d"];
-const walkerToken = ["e"];
+const userToken = ['a', 'b', 'c'];
+const adminToken = ['d'];
+const walkerToken = ['e'];
 const dbRef = ref(getDatabase());
 let userData;
 
@@ -102,7 +102,7 @@ function getUserData() {
           /* Promise is resolved here.  */
           resolve(arr);
         } else {
-          console.log("No data available");
+          console.log('No data available');
         }
       })
       .catch((error) => {
@@ -293,7 +293,7 @@ function fillNewReqTable(data){
     const user = Object.values(data[0])[i++];
     tr.children[0].textContent = trailingZeroes(user.checkInTime.hour, 2)
                                 + ':' + trailingZeroes(user.checkInTime.
-                                  minute, 2);
+                                  minute, 2) + 'PM';
     tr.children[1].textContent = user.name;
     tr.children[2].textContent = user.addresses.srcAddressL1 + ' '
                                   user.addresses.srcAddressL2;
@@ -307,7 +307,8 @@ function fillNewReqTable(data){
  * @function fillPendingReqTable
  * @param { user } data 
  * @brief fills the tables in the requests page (index.html).
- *        This function should be called by the fill table.
+ *        This function should be called once the data is successfully
+ *        retrieved.
  *        Note that the data is an array of two objects.
  *        1. Assigned user objs and 2. Unassigned user objs.
  * */
@@ -327,7 +328,7 @@ function fillNewReqTable(data){
     const user = Object.values(data[1])[i++];
     tr.children[0].textContent = trailingZeroes(user.checkInTime.hour, 2)
                                 + ':' + trailingZeroes(user.checkInTime.
-                                  minute, 2);
+                                  minute, 2) + 'PM';
     tr.children[1].textContent = user.name;
     tr.children[2].textContent = user.addresses.dstAddressL1 + ' '
                                   user.addresses.dstAddressL2;
