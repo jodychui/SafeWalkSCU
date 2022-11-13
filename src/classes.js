@@ -62,12 +62,12 @@ function user(
   };
   /* fields */
   this.assigned = true;
-  (this.pairedWith = " "),
-    (this.checkInTime = {
+  this.pairedWith = " ";
+  this.checkInTime = {
       dateObj: new Date(),
       hour: 0,
       minute: 0,
-    });
+    };
   this.checkOutTime = {
     dateObj: new Date(),
     hour: 0,

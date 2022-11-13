@@ -88,6 +88,7 @@ function getUserData() {
     return get(child(dbRef, `users`))
       .then((snapshot) => {
         if (snapshot.exists()) {
+          
           let arr = [];
           /* To limit the reading to max 5 user entries...
            This may be useful for reading the number of walkers */
@@ -117,8 +118,8 @@ function getUserData() {
        //// Call fillTable() here. 
     */
 
+    console.log(typeof(data));
     console.log(data);
-
     return data;
   });
 }
@@ -127,7 +128,7 @@ function getUserData() {
 
 /**
  * @function writeUserData
- * @param {user}
+ * @param {user} user
  * @brief Takes user (walkee) object and writes to the database in
  * database path `/users/<authorizationToken>`.
  * */
@@ -237,9 +238,10 @@ async function main() {
   /* getUserData is async. That means userData will be undefined
      until the data is completely retrieved. */
   // userData = getUserData();
-  
   const user1 = new user(userToken[0],'james','xxx@scu.edu','33333332', 't', 't', 't', 't');
   console.log('the user: ', user1);
+  
+  // fillTable(user1);
   // user1.assigned = true;
   // console.log(user1);
   // writeUserData(user1);
@@ -254,18 +256,40 @@ main();
 
 /**
  * @function fillTable
- * @param { user } userData
+ * @param { user } data
  * @brief fills the tables in the requests page (index.html).
  *        This function should be called by 
- * 
  * */
-function fillTable(userData){
-  /* First, create a table row */
+function fillTable(data){
+  /* 1. First, create a table row and create a reference to the tbody.*/
   const tbody = document.querySelector('.new-requests>tbody');
   const firstRow = document.querySelector('tbody>tr');
-  /* Copy the first node */
-  const secondRow = firstRow.cloneNode(true);
-  
-}
 
+  /* 2. Make dynamic copies of the row that is empty and append them to
+        the tbody as a child. */
+  for( child of firstRow){
+    child.textContent = '';
+  }
+
+  /* 3. Create data's number of rows. */
+  for (d of data) {
+    const newRow = firstRow.cloneNode(true);
+    tbody.appendChild(newRow);
+  }
+  /* 3. Iterate through the userDataObjs, append new texts to the new 
+        empty rows, then append them as children. */
+  for (child of ){
+    newRow.childNodes[0].textContent = data.checkInTime.hour 
+                               + ':' + data.checkInTime.minute;
+    newRow.childNodes[1].textContent = data.name;
+    newRow.childNodes[2].textContent = data.addresses.srcAddressL1 +
+                                       data.addresses.dstAddressL2;
+    newRow.childNodes[3].textContent = data.pairedWith;
+    /* create a new row */
+    
+  }
+    
+}
+  /* Copy the first node */
+  
 
