@@ -13,9 +13,9 @@ function user(
   email,
   phoneNumber,
   srcAddressL1,
-  srcAddressL2 = " ",
+  srcAddressL2 = ' ',
   dstAddressL1,
-  dstAddressL2 = " "
+  dstAddressL2 = ' '
 ) {
   this.token = token;
   this.name = name;
@@ -51,7 +51,7 @@ function user(
   /* Calculate the difference in time, returns the difference in minutes */
   this.getElapsedTime = function () {
     if (this.checkInTime === undefined || this.checkOutTime === undefined) {
-      console.log("Please set the checkin/checkout time first");
+      console.log('Please set the checkin/checkout time first');
       return;
     }
     const difference = Math.abs(

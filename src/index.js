@@ -12,7 +12,7 @@
 
 // Import the functions you need from the SDKs you need
 // import { initializeApp } from 'firebase/app';
-// import { getDatabase } from 'firebase/database';
+// import { getDatabase, ref, set, child, get, Database, remove } from 'firebase/database';
 // import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 /* Using browser modules for now... please do not delete above */
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js';
@@ -22,6 +22,7 @@ import {
   set,
   child,
   get,
+  remove
 } from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js';
 /* For login */
 import {
@@ -45,7 +46,7 @@ const firebaseConfig = {
 
 /**
  *  @brief Initializes the firebase application.
- *  @const auto
+ *  @const {Database} db
  *
  * */
 const app = initializeApp(firebaseConfig);
@@ -63,6 +64,9 @@ const userToken = ['a', 'b', 'c'];
 const adminToken = ['d'];
 const walkerToken = ['e'];
 const dbRef = ref(getDatabase());
+const emptyElements = cloneEmptyElements();
+
+
 let userData;
 
 /**
@@ -85,7 +89,7 @@ function getUserData() {
        2. the path where the database is located. The child() will 
           give us the subpath of /users/<this>. 
      */
-    return get(child(dbRef, `users`))
+    return get(dbRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
           
@@ -117,11 +121,12 @@ function getUserData() {
     /* //// Do stuff here with the data.
        //// Call fillTable() here. 
     */
-
-    console.log(typeof(data));
     console.log(data);
-    fillNewReqTable(data);
-    fillPendingReqTable(data);
+    console.log(data[0]['unassigned']);
+    fillNewReqTable(data[0]['unassigned']);
+    fillPendingReqTable(data[0]['assigned']);
+    // setTimeout(deleteUser(data[0]['a']), 3000);
+
     return data;
   });
 }
@@ -138,9 +143,9 @@ function writeUserData(user) {
   /* Whenever we're writing we need to get the reference to the 
      database, and we can do so initializing it with a getDatabase() method.
   */
-  const db = getDatabase();
   set(ref(db, `users/${user.assigned ? 'assigned': 'unassigned'}/`
-                     + userToken[0]), {
+                     + user.token), {
+    token: user.token,
     name: user.name,
     email: user.email,
     phoneNumber: user.phoneNumber,
@@ -164,6 +169,7 @@ function writeUserData(user) {
       walker1: user.pairedWalkers.walker1,
       walker2: user.pairedWalkers.walker2,
     },
+    assigned: user.assigned,
   });
 }
 
@@ -174,8 +180,8 @@ function writeUserData(user) {
  * database path `/walkers/<authorizationToken>`.
  * */
 function writeWalkerData(user) {
-  const db = getDatabase();
   set(ref(db, 'walkers/' + walkerToken[2]), {
+    token: user.token,
     name: user.name,
     email: user.email,
     phoneNumber: user.phoneNumber,
@@ -248,14 +254,30 @@ async function main() {
   //                 '3234233423', '254 Villas Ave', '','324 Villa Rd', '' );
   // console.log(user1);
   // writeUserData(user1);
+  let fields = {
+    userToken: ['a','b','c','d'],
+    names : ['Jodi', 'Marty', 'Kristina', 'Shamwow'],
+    emails : ['Jodi@scu.edu', 'Marty@scu.edu', 'Kristina@scu.edu', 'shamwow@scu.edu'],
+    phoneNumbers : ['626-321-4212','503-421-2451','322-323-3543','434-434-4652'],
+    srcAddressL1 : ['324 Villa Rd', '322 Country Rd', '523 New York Ave', '242 Camino Rd'],
+    dstAddressL1 : ['423 El Camino Rd' ,'322 DownTown Ave','234 Vickie Ave', '234 Marengo Ave'],
+    assigned: [false,false,false,true],
+  }
+  let arr= [];
+  for (let i = 0; i < 4; i++){
+    let user1 = new user(fields.userToken[i],fields.names[i],fields.emails[i]
+                    , fields.phoneNumbers[i], fields.srcAddressL1[i]
+                    , '', fields.dstAddressL1[i] );
+    user1.assigned = fields.assigned[i];
+    arr.push(user1);
+    writeUserData(user1);
+  }
+
   
-  // getUserData();
-    
-  
+  getUserData();
 }
 
 main();
-
 /**
  * @function fillTable
  * @param { user } data 
@@ -266,31 +288,45 @@ main();
  * */
 function fillNewReqTable(data){
   /* 1. First, create a table row and create a reference to the tbody.*/
-  const tbody = document.querySelector('.new-requests>tbody');
-  const firstRow = tbody.children[0];
-
-  /* 2. Make dynamic copies of the row that is empty and append them to
-        the tbody as a child. */
-  const dataSize = Object.keys(data[0]).length;
-  for( /* const child of firstRow.children */
-      let i = 0; i < 4; i++){
-    firstRow.children[i].textContent = '';
+  const tbody = document.querySelectorAll('.new-requests>tbody')[0];
+  const tr = tbody.children[0];
+  if (typeof data === "undefined") {
+    if (typeof (tr) ==='undefined') return;
+    if (tr.children.length > 0 ){
+      [...tr.children].forEach(function(elem) {
+        elem.textContent = '';
+        elem.remove();
+      });
+    }
+    tbody.setAttribute(
+      "style",
+      "display: flex; justify-content: center;" + "padding: 0.75rem"
+    );
+    tbody.textContent = "No ongoing requests.";
+    return;
   }
-  console.log(dataSize);
+  /* 2. Clear all the children of tbody and make dynamic copies of
+        the row that is empty and append them to the tbody as a child. */
+  const dataSize = Object.keys(data).length;
+  [...tbody.children].forEach((node) => {node.remove()});
   /* 3. Create data's number of rows. */
-  for (let i = 0; i < dataSize - 1; i++) {
-    const newRow = firstRow.cloneNode(true);
+  for (let i = 0; i < dataSize; i++) {
+    const newRow = emptyElements['unassignedRow'].cloneNode(true);
     tbody.appendChild(newRow);
   }
   /* 3. Iterate through the userDataObjs, append new texts to the new 
         empty rows, then append them as children.
         We can access the unassigned users by iterating through 
         each keys of the first element of our student object array.
+        We also set the unique token in the id attribute per row to 
+        allow us to select them with its unique property.
         */
-  console.log(Object.values(data[0]));
   let i = 0;
   for (const tr of tbody.children){
-    const user = Object.values(data[0])[i++];
+    console.log(data);
+    const user = Object.values(data)[i++];
+    tr.setAttribute('userToken', user.token);
+    tr.setAttribute('assigned', 'false');
     tr.children[0].textContent = trailingZeroes(user.checkInTime.hour, 2)
                                 + ':' + trailingZeroes(user.checkInTime.
                                   minute, 2) + 'PM';
@@ -299,6 +335,7 @@ function fillNewReqTable(data){
                                   user.addresses.srcAddressL2;
     tr.children[3].textContent = user.addresses.dstAddressL1 + ' '
                                   user.addresses.dstAddressL2;
+    tr.children[tr.children.length - 1].addEventListener('click', deleteUser);
   }
 }
 
@@ -308,24 +345,35 @@ function fillNewReqTable(data){
  * @param { user } data 
  * @brief fills the tables in the requests page (index.html).
  *        This function should be called once the data is successfully
- *        retrieved.
- *        Note that the data is an array of two objects.
- *        1. Assigned user objs and 2. Unassigned user objs.
+ *        retrieved. Assigned.
  * */
  function fillPendingReqTable(data){
-  const tbody = document.querySelectorAll('.new-requests>tbody')[1];
-  const firstRow = tbody.children[0];
-  const dataSize = Object.keys(data[1]).length;
-  for( let i = 0; i < 4; i++){
-    firstRow.children[i].textContent = '';
-  }
-  for (let i = 0; i < dataSize - 1; i++) {
-    const newRow = firstRow.cloneNode(true);
+   const tbody = document.querySelectorAll('.new-requests>tbody')[1];
+   const tr = tbody.children[0];
+   if (typeof(data) === 'undefined'){
+    if (typeof (tr) ==='undefined') return;
+    if (tr.children.length > 0){
+      [...tr.children].forEach(function(elem) {
+        elem.textContent = '';
+        elem.remove();
+      });
+    }
+     tbody.setAttribute('style','display: flex; justify-content: center;'
+                      + 'padding: 0.75rem');
+     tbody.textContent = 'No ongoing requests.';
+     return;
+   }
+  const dataSize = Object.keys(data).length;
+  [...tbody.children].forEach((node) => {node.remove()});
+  for (let i = 0; i < dataSize; i++) {
+    const newRow = emptyElements['assignedRow'].cloneNode(true);
     tbody.appendChild(newRow);
   }
   let i = 0;
   for (const tr of tbody.children){
-    const user = Object.values(data[1])[i++];
+    const user = Object.values(data)[i++];
+    tr.setAttribute('userToken', user.token);
+    tr.setAttribute('assigned', true);
     tr.children[0].textContent = trailingZeroes(user.checkInTime.hour, 2)
                                 + ':' + trailingZeroes(user.checkInTime.
                                   minute, 2) + 'PM';
@@ -335,9 +383,52 @@ function fillNewReqTable(data){
     tr.children[3].textContent = user.pairedWalkers.walker1 + ' & ' 
                                + user.pairedWalkers.walker2;
     tr.children[4].textContent = 'TODO';
+    tr.children[tr.children.length - 1].addEventListener('click', deleteUser);
   }
 }
+
+/* //! ==================== DELETION ACTION ============================= */
+
+/**
+ * @function deleteUser
+ * @param {String} userToken 
+ * @param {Boolean} assigned 
+ * @brief Deletes a directory in firebase db which contains the user data.
+ *        Grabs userToken from the id and assigned attributes on the <td> elements
+ *        
+ */
+async function deleteUser(e) {
+  console.log(`you clicked ${e.currentTarget}!!`);
+  const userToken = e.currentTarget.parentNode.getAttribute('userToken');
+  const assigned = e.currentTarget.parentNode.getAttribute('assigned');
   
+  /* 1. Create a reference to the db with the given userToken. and get its 
+        directory. */
+    console.log(assigned);
+    const path = `users/${assigned === 'true' ? 'assigned': 'unassigned'}/${userToken}`;
+    console.log(path);
+    const target = ref(db, path);
+  /* 2. Call the firebase remove() */
+    remove(target);
+    alert('user has been deleted!');
+    
+    getUserData();
+}
+
+/**
+ * @function clearTable
+ * @param {Node} tableNode 
+ */
+function clearChildren(tableNode){
+   const row = tableNode.children[0].cloneNode(true);
+   [...tableNode.children].forEach(function (elem) {
+      elem.remove();
+   })
+   tableNode.appendChild(row);
+}
+
+
+
 /**
  * @param {Number} number 
  * @param {Number} howMany 
@@ -350,4 +441,26 @@ function trailingZeroes(number, howMany){
     useGrouping: false
   })
   return str;
+}
+
+function cloneEmptyElements(){
+  /* For Unassigned Table Row */
+  let arr = [];
+  let row1 = document.querySelector('tbody').children[0];
+  let newRow1 = row1.cloneNode(true);
+  for (let i = 0; i < 4; i++){
+    newRow1.children[i].textContent ='';
+  }
+  arr['unassignedRow'] = newRow1;
+
+  /* For assigned Table Row */
+  let row2 = document.querySelectorAll('tbody')[1].children[0];
+  let newRow2 = row2.cloneNode(true);
+  for (let i = 0; i < 5; i++){
+    newRow2.children[i].textContent ='';
+  }
+  arr['assignedRow'] = newRow2;
+
+  return arr;
+
 }
