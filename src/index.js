@@ -15,7 +15,7 @@
 // import { getDatabase, ref, set, child, get, Database, remove } from 'firebase/database';
 // import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 /* Using browser modules for now... please do not delete above */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js";
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js';
 import {
   getDatabase,
   ref,
@@ -23,25 +23,25 @@ import {
   child,
   get,
   remove,
-} from "https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js";
+} from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js';
 /* For login */
 import {
   getAuth,
   signInWithPopup,
   GoogleAuthProvider,
-} from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
+} from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js';
 
-import { user } from "./classes.js";
+import { user } from './classes.js';
 // import the walker object here!
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD4ER15Ypc7TCAXGlt_1tvmXEuLpXal14k",
-  authDomain: "safewalkscu.firebaseapp.com",
-  databaseURL: "https://safewalkscu-default-rtdb.firebaseio.com",
-  projectId: "safewalkscu",
-  storageBucket: "safewalkscu.appspot.com",
-  messagingSenderId: "558548226148",
-  appId: "1:558548226148:web:01051d9600a5174e9ecf71",
+  apiKey: 'AIzaSyD4ER15Ypc7TCAXGlt_1tvmXEuLpXal14k',
+  authDomain: 'safewalkscu.firebaseapp.com',
+  databaseURL: 'https://safewalkscu-default-rtdb.firebaseio.com',
+  projectId: 'safewalkscu',
+  storageBucket: 'safewalkscu.appspot.com',
+  messagingSenderId: '558548226148',
+  appId: '1:558548226148:web:01051d9600a5174e9ecf71',
 };
 
 /**
@@ -60,9 +60,9 @@ const db = getDatabase();
  *
  */
 const MAX_WALKER_COUNT = 5;
-const userToken = ["a", "b", "c"];
-const adminToken = ["d"];
-const walkerToken = ["e"];
+const userToken = ['a', 'b', 'c'];
+const adminToken = ['d'];
+const walkerToken = ['e'];
 const dbRef = ref(getDatabase());
 const emptyElements = cloneEmptyElements();
 
@@ -104,7 +104,7 @@ function initializeData() {
           /* Promise is resolved here.  */
           resolve(arr);
         } else {
-          console.log("No data available");
+          console.log('No data available');
         }
       })
       .catch((error) => {
@@ -120,9 +120,9 @@ function initializeData() {
        //// Call fillTable() here. 
     */
     console.log(data);
-    console.log(data[0]["unassigned"]);
-    fillUnassignedTable(data[0]["unassigned"]);
-    fillAssignedTable(data[0]["assigned"]);
+    console.log(data[0]['unassigned']);
+    fillUnassignedTable(data[0]['unassigned']);
+    fillAssignedTable(data[0]['assigned']);
     // setTimeout(deleteUser(data[0]['a']), 3000);
 
     return data;
@@ -140,7 +140,7 @@ function writeUserData(user) {
      database, and we can do so initializing it with a getDatabase() method.
   */
   set(
-    ref(db, `users/${user.assigned ? "assigned" : "unassigned"}/` + user.token),
+    ref(db, `users/${user.assigned ? 'assigned' : 'unassigned'}/` + user.token),
     {
       token: user.token,
       name: user.name,
@@ -178,7 +178,7 @@ function writeUserData(user) {
  * database path `/walkers/<authorizationToken>`.
  * */
 function writeWalkerData(user) {
-  set(ref(db, "walkers/" + walkerToken[2]), {
+  set(ref(db, 'walkers/' + walkerToken[2]), {
     token: user.token,
     name: user.name,
     email: user.email,
@@ -248,31 +248,31 @@ async function main() {
   /* initializeData is async. That means userData will be undefined
      until the data is completely retrieved. */
   let fields = {
-    userToken: ["a", "b", "c", "d"],
-    names: ["Jodi", "Marty", "Kristina", "Shamwow"],
+    userToken: ['a', 'b', 'c', 'd'],
+    names: ['Jodi', 'Marty', 'Kristina', 'Shamwow'],
     emails: [
-      "Jodi@scu.edu",
-      "Marty@scu.edu",
-      "Kristina@scu.edu",
-      "shamwow@scu.edu",
+      'Jodi@scu.edu',
+      'Marty@scu.edu',
+      'Kristina@scu.edu',
+      'shamwow@scu.edu',
     ],
     phoneNumbers: [
-      "626-321-4212",
-      "503-421-2451",
-      "322-323-3543",
-      "434-434-4652",
+      '626-321-4212',
+      '503-421-2451',
+      '322-323-3543',
+      '434-434-4652',
     ],
     srcAddressL1: [
-      "324 Villa Rd",
-      "322 Country Rd",
-      "523 New York Ave",
-      "242 Camino Rd",
+      '324 Villa Rd',
+      '322 Country Rd',
+      '523 New York Ave',
+      '242 Camino Rd',
     ],
     dstAddressL1: [
-      "423 El Camino Rd",
-      "322 DownTown Ave",
-      "234 Vickie Ave",
-      "234 Marengo Ave",
+      '423 El Camino Rd',
+      '322 DownTown Ave',
+      '234 Vickie Ave',
+      '234 Marengo Ave',
     ],
     assigned: [false, false, false, true],
   };
@@ -284,15 +284,15 @@ async function main() {
       fields.emails[i],
       fields.phoneNumbers[i],
       fields.srcAddressL1[i],
-      "",
+      '',
       fields.dstAddressL1[i]
     );
     user1.assigned = fields.assigned[i];
     arr.push(user1);
-    // writeUserData(user1);
+    writeUserData(user1);
   }
 
-  // initializeData();
+  initializeData();
 }
 
 main();
@@ -306,21 +306,21 @@ main();
  * */
 function fillUnassignedTable(data) {
   /* 1. First, create a table row and create a reference to the tbody.*/
-  const tbody = document.querySelectorAll(".new-requests>tbody")[0];
+  const tbody = document.querySelectorAll('.new-requests>tbody')[0];
   const tr = tbody.children[0];
-  if (typeof data === "undefined") {
-    if (typeof tr === "undefined") return;
+  if (typeof data === 'undefined') {
+    if (typeof tr === 'undefined') return;
     if (tr.children.length > 0) {
       [...tr.children].forEach(function (elem) {
-        elem.textContent = "";
+        elem.textContent = '';
         elem.remove();
       });
     }
     tbody.setAttribute(
-      "style",
-      "display: flex; justify-content: center;" + "padding: 0.75rem"
+      'style',
+      'display: flex; justify-content: center;' + 'padding: 0.75rem'
     );
-    tbody.textContent = "No ongoing requests.";
+    tbody.textContent = 'No ongoing requests.';
     return;
   }
   /* 2. Clear all the children of tbody and make dynamic copies of
@@ -331,7 +331,7 @@ function fillUnassignedTable(data) {
   });
   /* 3. Create data's number of rows. */
   for (let i = 0; i < dataSize; i++) {
-    const newRow = emptyElements["unassignedRow"].cloneNode(true);
+    const newRow = emptyElements['unassignedRow'].cloneNode(true);
     tbody.appendChild(newRow);
   }
   /* 3. Iterate through the userDataObjs, append new texts to the new 
@@ -344,19 +344,19 @@ function fillUnassignedTable(data) {
   let i = 0;
   for (const tr of tbody.children) {
     const user = Object.values(data)[i++];
-    tr.setAttribute("userToken", user.token);
-    tr.setAttribute("assigned", "false");
+    tr.setAttribute('userToken', user.token);
+    tr.setAttribute('assigned', 'false');
     tr.children[0].textContent =
       trailingZeroes(user.checkInTime.hour, 2) +
-      ":" +
+      ':' +
       trailingZeroes(user.checkInTime.minute, 2) +
-      "PM";
+      'PM';
     tr.children[1].textContent = user.name;
-    tr.children[2].textContent = user.addresses.srcAddressL1 + " ";
+    tr.children[2].textContent = user.addresses.srcAddressL1 + ' ';
     user.addresses.srcAddressL2;
-    tr.children[3].textContent = user.addresses.dstAddressL1 + " ";
+    tr.children[3].textContent = user.addresses.dstAddressL1 + ' ';
     user.addresses.dstAddressL2;
-    tr.children[tr.children.length - 1].addEventListener("click", deleteUser);
+    tr.children[tr.children.length - 1].addEventListener('click', deleteUser);
   }
 }
 
@@ -368,21 +368,21 @@ function fillUnassignedTable(data) {
  *        retrieved. Assigned
  * */
 function fillAssignedTable(data) {
-  const tbody = document.querySelectorAll(".new-requests>tbody")[1];
+  const tbody = document.querySelectorAll('.new-requests>tbody')[1];
   const tr = tbody.children[0];
-  if (typeof data === "undefined") {
-    if (typeof tr === "undefined") return;
+  if (typeof data === 'undefined') {
+    if (typeof tr === 'undefined') return;
     if (tr.children.length > 0) {
       [...tr.children].forEach(function (elem) {
-        elem.textContent = "";
+        elem.textContent = '';
         elem.remove();
       });
     }
     tbody.setAttribute(
-      "style",
-      "display: flex; justify-content: center;" + "padding: 0.75rem"
+      'style',
+      'display: flex; justify-content: center;' + 'padding: 0.75rem'
     );
-    tbody.textContent = "No ongoing requests.";
+    tbody.textContent = 'No ongoing requests.';
     return;
   }
   const dataSize = Object.keys(data).length;
@@ -390,26 +390,26 @@ function fillAssignedTable(data) {
     node.remove();
   });
   for (let i = 0; i < dataSize; i++) {
-    const newRow = emptyElements["assignedRow"].cloneNode(true);
+    const newRow = emptyElements['assignedRow'].cloneNode(true);
     tbody.appendChild(newRow);
   }
   let i = 0;
   for (const tr of tbody.children) {
     const user = Object.values(data)[i++];
-    tr.setAttribute("userToken", user.token);
-    tr.setAttribute("assigned", true);
+    tr.setAttribute('userToken', user.token);
+    tr.setAttribute('assigned', true);
     tr.children[0].textContent =
       trailingZeroes(user.checkInTime.hour, 2) +
-      ":" +
+      ':' +
       trailingZeroes(user.checkInTime.minute, 2) +
-      "PM";
+      'PM';
     tr.children[1].textContent = user.name;
-    tr.children[2].textContent = user.addresses.dstAddressL1 + " ";
+    tr.children[2].textContent = user.addresses.dstAddressL1 + ' ';
     user.addresses.dstAddressL2;
     tr.children[3].textContent =
-      user.pairedWalkers.walker1 + " & " + user.pairedWalkers.walker2;
-    tr.children[4].textContent = "TODO";
-    tr.children[tr.children.length - 1].addEventListener("click", deleteUser);
+      user.pairedWalkers.walker1 + ' & ' + user.pairedWalkers.walker2;
+    tr.children[4].textContent = 'TODO';
+    tr.children[tr.children.length - 1].addEventListener('click', deleteUser);
   }
 }
 
@@ -425,20 +425,20 @@ function fillAssignedTable(data) {
  */
 async function deleteUser(e) {
   console.log(`you clicked ${e.currentTarget}!!`);
-  const userToken = e.currentTarget.parentNode.getAttribute("userToken");
-  const assigned = e.currentTarget.parentNode.getAttribute("assigned");
+  const userToken = e.currentTarget.parentNode.getAttribute('userToken');
+  const assigned = e.currentTarget.parentNode.getAttribute('assigned');
 
   /* 1. Create a reference to the db with the given userToken. and get its 
         directory. */
   console.log(assigned);
   const path = `users/${
-    assigned === "true" ? "assigned" : "unassigned"
+    assigned === 'true' ? 'assigned' : 'unassigned'
   }/${userToken}`;
   console.log(path);
   const target = ref(db, path);
   /* 2. Call the firebase remove() */
   remove(target);
-  alert("user has been deleted!");
+  alert('user has been deleted!');
 
   initializeData();
 }
@@ -450,7 +450,7 @@ async function deleteUser(e) {
  *          {howMany} decimal places.
  */
 function trailingZeroes(number, howMany) {
-  const str = number.toLocaleString("en-US", {
+  const str = number.toLocaleString('en-US', {
     minimumIntegerDigits: howMany,
     useGrouping: false,
   });
@@ -470,20 +470,20 @@ function trailingZeroes(number, howMany) {
 function cloneEmptyElements() {
   /* For Unassigned Table Row */
   let arr = [];
-  let row1 = document.querySelector("tbody").children[0];
+  let row1 = document.querySelector('tbody').children[0];
   let newRow1 = row1.cloneNode(true);
   for (let i = 0; i < 4; i++) {
-    newRow1.children[i].textContent = "";
+    newRow1.children[i].textContent = '';
   }
-  arr["unassignedRow"] = newRow1;
+  arr['unassignedRow'] = newRow1;
 
   /* For assigned Table Row */
-  let row2 = document.querySelectorAll("tbody")[1].children[0];
+  let row2 = document.querySelectorAll('tbody')[1].children[0];
   let newRow2 = row2.cloneNode(true);
   for (let i = 0; i < 5; i++) {
-    newRow2.children[i].textContent = "";
+    newRow2.children[i].textContent = '';
   }
-  arr["assignedRow"] = newRow2;
+  arr['assignedRow'] = newRow2;
 
   return arr;
 }
