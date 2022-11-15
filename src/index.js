@@ -316,6 +316,9 @@ function fillUnassignedTable(data) {
     clearUnassignedTable();
     return;
   }
+  if (tbody.children.length === 0){
+    resetTbodyStyle(tbody);
+  }
   /* 2. Clear all the children of tbody and make dynamic copies of
         the row that is empty and append them to the tbody as a child. */
   const dataSize = Object.keys(data).length;
@@ -366,6 +369,9 @@ function fillAssignedTable(data) {
   if (typeof data === 'undefined') {
     clearAssignedTable();
     return;
+  }
+  if (tbody.children.length === 0){
+    resetTbodyStyle(tbody);
   }
   const dataSize = Object.keys(data).length;
   [...tbody.children].forEach((node) => {
@@ -435,11 +441,9 @@ async function deleteUserOnClick(e) {
 async function deleteUserByToken(userToken, assigned, deleted = true) {
   const path = `users/${
     assigned === 'true' ? 'assigned' : 'unassigned'
-  }/${userToken}`;
+                       }/${userToken}`;
   console.log(path);
-  const target = ref(db, path);
-  /* 2. Call the firebase remove() */
-  remove(target);
+  remove(ref(db, path));
   deleted ? alert('user has been deleted!') : alert('user has been moved!');
 
   initializeData();
@@ -500,6 +504,21 @@ function clearAllTables(){
   clearUnassignedTable();
 }
 
+/**
+ * @function resetTbodyStyle
+ * @param {Node} node 
+ * @brief Resets the table body element back to how it was. Can be called
+ *        when resetting properties set by @function clearUnassignedTable
+ *        or @function clearAssignedTable
+ */
+function resetTbodyStyle(node){
+  node.style.removeProperty('display');
+  node.style.removeProperty('justify-content');
+  node.style.removeProperty('padding');
+  node.textContent = '';
+}
+
+
 /* //! ======================== MOVE ACTION ============================ */
 /**
  * @function moveToAssigned
@@ -517,7 +536,7 @@ function moveToAssigned(userToken){
      to 'assigned.'*/
   newAssignedUser.assigned = true;
   writeUserData(newAssignedUser);    
-  setTimeout(()=> initializeData(),1000);
+  initializeData();
 }
 
 /**
