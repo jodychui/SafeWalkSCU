@@ -12,7 +12,7 @@
 
 // Import the functions you need from the SDKs you need
 // import { initializeApp } from 'firebase/app';
-// import { getDatabase, ref, set, child, get, Database, remove, limitToFirst, DataSnapshot } from 'firebase/database';
+// import { getDatabase, ref, set, child, get, Database, remove, onChildChanged, DataSnapshot } from 'firebase/database';
 // import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 /* Using browser modules for now... please do not delete above */
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js';
@@ -23,6 +23,8 @@ import {
   child,
   get,
   limitToFirst,
+  onChildChanged,
+  onChildRemoved,
   remove,
 } from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js';
 /* For login */
@@ -102,6 +104,7 @@ function initializeData() {
             obj['unassigned'] = snapshot.child('unassigned').val();
           }
           /* Promise is resolved here.  */
+          resolve(obj);
         } else {
           console.log('No data available');
           clearAllTables();
@@ -123,7 +126,9 @@ function initializeData() {
     globalUserData = data;
     fillUnassignedTable(data['unassigned']);
     fillAssignedTable(data['assigned']);
-    
+    onChildChanged(dbRef, initializeData );
+    onChildRemoved(dbRef, initializeData);
+
 
     return data;
   });
