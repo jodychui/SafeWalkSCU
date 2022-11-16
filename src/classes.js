@@ -38,6 +38,7 @@ function user(
     dateObj: new Date(),
     hour: 0,
     minute: 0,
+    meridiem: "",
   };
   this.checkOutTime = {
     dateObj: new Date(),
@@ -59,23 +60,23 @@ function user(
  * @brief
  */
 const userGetElapsedTime = function (userObj) {
-  // console.log(userObj);
-  // console.log(userObj.checkInTime.dateObj.getMilliseconds());
-  let difference = new Date(Math.abs(new Date() - userObj.checkInTime.dateObj));
-  userObj.elapsedTime.hour = difference.getHours();
+  let difference = new Date(new Date() - userObj.checkInTime.dateObj);
+  /* Okay, I have no idea why but by default hours is getting
+     set to 16, even though it should be 0. */
+  userObj.elapsedTime.hour = difference.getHours() - 16;
   userObj.elapsedTime.minute = difference.getMinutes();
-  return userObj;
 };
 
 const userSetCheckOutTime = function (userObj) {
   const d = new Date();
   const obj = {
-    dateObj: d,
-    hour: d.getHours(),
+    dateObj: d /* In case we need to perform date 
+                                   arithmetics, such as getElapsedTime() */,
+    hour: d.getHours() % 12,
     minute: d.getMinutes(),
+    meridiem: d.getHours() / 12 > 1 ? "PM" : "AM",
   };
   userObj.checkOutTime = obj;
-  return userObj;
 };
 
 const userSetCheckInTime = function (userObj) {
@@ -83,11 +84,13 @@ const userSetCheckInTime = function (userObj) {
   const obj = {
     dateObj: d /* In case we need to perform date 
                                    arithmetics, such as getElapsedTime() */,
-    hour: d.getHours(),
+    hour: d.getHours() % 12,
     minute: d.getMinutes(),
+    meridiem: d.getHours() / 12 > 1 ? "PM" : "AM",
   };
+  console.log("the AM/PM", obj.meridiem);
+
   userObj.checkInTime = obj;
-  return userObj;
 };
 
 export { user, userGetElapsedTime, userSetCheckInTime, userSetCheckOutTime };

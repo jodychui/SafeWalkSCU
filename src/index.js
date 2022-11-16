@@ -34,7 +34,12 @@ import {
   GoogleAuthProvider,
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
 
-import { user, userGetElapsedTime, userSetCheckInTime, userSetCheckOutTime} from "./classes.js";
+import {
+  user,
+  userGetElapsedTime,
+  userSetCheckInTime,
+  userSetCheckOutTime,
+} from "./classes.js";
 // import the walker object here!
 
 const firebaseConfig = {
@@ -123,7 +128,7 @@ function initializeData() {
     */
     /* Make a global user data... */
     /* First and foremost we convert necessary properties to objects. */
-    data = stringToDateObj(data);
+    stringToDateObj(data);
     globalUserData = data;
     fillUnassignedTable(data["unassigned"]);
     fillAssignedTable(data["assigned"]);
@@ -161,11 +166,13 @@ function writeUserData(user) {
         dateObj: user.checkInTime.dateObj.toString(),
         hour: user.checkInTime.hour,
         minute: user.checkInTime.minute,
+        meridiem: user.checkInTime.meridiem,
       },
       checkOutTime: {
         dateObj: user.checkOutTime.dateObj.toString(),
         hour: user.checkInTime.hour,
         minute: user.checkInTime.minute,
+        meridiem: user.checkInTime.meridiem,
       },
       elapsedTime: {
         dateObj: user.elapsedTime.dateObj.toString(),
@@ -297,21 +304,20 @@ async function main() {
   //     fields.dstAddressL1[i]
   //   );
   //   user1.assigned = fields.assigned[i];
-  //   user1 = userSetCheckInTime(user1);
+  //   userSetCheckInTime(user1);
   //   arr.push(user1);
   //   writeUserData(user1);
   // }
-  initializeData();
-  // const user1 = new user('e','sam','xxx@gmail.com','312-321-1231',
-  // 'vickie ave','','el camino rd',);
+  // const user1 = new user('e','Maxine','Maxine@ucsd.edu','312-321-1231',
+  // 'Oreo ave','','el camino rd');
   // user1.assigned = true;
-  // writeUserData(user1);
-  setInterval(function() {
-    console.log('Refreshing table...');
+  // userSetCheckInTime(user1);
+  initializeData();
+  setInterval(function () {
+    console.log("Refreshing table...");
     initializeData();
-}, 60 * 1000); // 60 * 1000 milsec
+  }, 60 * 1000); // 60 * 1000 milsec
 }
-
 
 main();
 /**
@@ -330,7 +336,7 @@ function fillUnassignedTable(data) {
     clearUnassignedTable();
     return;
   }
-  if (tbody.children.length === 0){
+  if (tbody.children.length === 0) {
     resetTbodyStyle(tbody);
   }
   /* 2. Clear all the children of tbody and make dynamic copies of
@@ -356,11 +362,11 @@ function fillUnassignedTable(data) {
     const user = Object.values(data)[i++];
     tr.setAttribute("userToken", user.token);
     tr.setAttribute("assigned", "false");
-    tr.children[0].textContent =
-      trailingZeroes(user.checkInTime.hour, 2) +
-      ":" +
-      trailingZeroes(user.checkInTime.minute, 2) +
-      "PM";
+    tr.children[0].textContent = `
+      ${trailingZeroes(user.checkInTime.hour, 2)}:${trailingZeroes(
+      user.checkInTime.minute,
+      2
+    )} ${user.checkInTime.meridiem}`;
     tr.children[1].textContent = user.name;
     tr.children[2].textContent = user.addresses.srcAddressL1 + " ";
     user.addresses.srcAddressL2;
@@ -387,7 +393,7 @@ function fillAssignedTable(data) {
     clearAssignedTable();
     return;
   }
-  if (tbody.children.length === 0){
+  if (tbody.children.length === 0) {
     resetTbodyStyle(tbody);
   }
   const dataSize = Object.keys(data).length;
@@ -398,26 +404,28 @@ function fillAssignedTable(data) {
     const newRow = emptyElements["assignedRow"].cloneNode(true);
     tbody.appendChild(newRow);
   }
-  
+
   let i = 0;
   for (const tr of tbody.children) {
     let user = Object.values(data)[i++];
     // console.log(user);
-    const elapsedTime = userGetElapsedTime(user).elapsedTime;
-    // console.log(user.prototype.getElapsedTime());
+    userGetElapsedTime(user);
     tr.setAttribute("userToken", user.token);
     tr.setAttribute("assigned", true);
-    tr.children[0].textContent =
-      trailingZeroes(user.checkInTime.hour, 2) +
-      ":" +
-      trailingZeroes(user.checkInTime.minute, 2) +
-      "PM";
+    tr.children[0].textContent = `
+    ${trailingZeroes(user.checkInTime.hour, 2)}:${trailingZeroes(
+      user.checkInTime.minute,
+      2
+    )} ${user.checkInTime.meridiem}`;
     tr.children[1].textContent = user.name;
     tr.children[2].textContent = user.addresses.dstAddressL1 + " ";
     tr.children[3].textContent =
       user.pairedWalkers.walker1Token + " & " + user.pairedWalkers.walker2Token;
-
-    tr.children[4].textContent = `${elapsedTime.minute} ${elapsedTime.minute > 1? 'mins':'min'}`; 
+    tr.children[4].textContent = `${user.elapsedTime.hour} ${
+      user.elapsedTime.hour > 1 ? "hours" : "hour"
+    } ${user.elapsedTime.minute} ${
+      user.elapsedTime.minute > 1 ? "mins" : "min"
+    }`;
     tr.children[tr.children.length - 1].addEventListener(
       "click",
       deleteUserOnClick
@@ -530,18 +538,17 @@ function clearAllTables() {
 
 /**
  * @function resetTbodyStyle
- * @param {Node} node 
+ * @param {Node} node
  * @brief Resets the table body element back to how it was. Can be called
  *        when resetting properties set by @function clearUnassignedTable
  *        or @function clearAssignedTable
  */
-function resetTbodyStyle(node){
-  node.style.removeProperty('display');
-  node.style.removeProperty('justify-content');
-  node.style.removeProperty('padding');
-  node.textContent = '';
+function resetTbodyStyle(node) {
+  node.style.removeProperty("display");
+  node.style.removeProperty("justify-content");
+  node.style.removeProperty("padding");
+  node.textContent = "";
 }
-
 
 /* //! ======================== MOVE ACTION ============================ */
 /**
@@ -559,7 +566,7 @@ function moveToAssigned(userToken) {
   /* Copy the data to the new assigned row. Change its assigned property
      to 'assigned.'*/
   newAssignedUser.assigned = true;
-  writeUserData(newAssignedUser);    
+  writeUserData(newAssignedUser);
   initializeData();
 }
 
@@ -609,36 +616,35 @@ function cloneEmptyElements() {
 }
 /**
  * @function stringToDateObj
- * @param {Object} data 
+ * @param {Object} data
  * @returns new data object with JSON components
  * @brief Converts string to JSON for necessary properties, such as Dates
  *        Geolocation.
  */
-function stringToDateObj(data){
-  if (typeof data['unassigned'] !== 'undefined'){
-    Object.values(data['unassigned']).forEach(
+function stringToDateObj(data) {
+  if (typeof data["unassigned"] !== "undefined") {
+    Object.values(data["unassigned"]).forEach(
       /**
-     * @param {user} user
-     */
+       * @param {user} user
+       */
       function (user) {
-      user.checkInTime.dateObj = new Date(user.checkInTime.dateObj);
-      user.checkOutTime.dateObj = new Date(user.checkInTime.dateObj);
-      user.elapsedTime.dateObj = new Date(user.checkInTime.dateObj);
-    })
+        user.checkInTime.dateObj = new Date(user.checkInTime.dateObj);
+        user.checkOutTime.dateObj = new Date(user.checkInTime.dateObj);
+        user.elapsedTime.dateObj = new Date(user.checkInTime.dateObj);
+      }
+    );
   }
-  if (typeof data['assigned'] !== 'undefined'){
-    Object.values(data['assigned']).forEach(
+  if (typeof data["assigned"] !== "undefined") {
+    Object.values(data["assigned"]).forEach(
       /**
-     * @param {user} user
-     */
+       * @param {user} user
+       */
       function (user) {
-  
-      user.checkInTime.dateObj = new Date(user.checkInTime.dateObj);
-      user.checkOutTime.dateObj = new Date(user.checkOutTime.dateObj);
-      user.elapsedTime.dateObj = new Date(user.elapsedTime.dateObj);
-      
-    })
-
+        user.checkInTime.dateObj = new Date(user.checkInTime.dateObj);
+        user.checkOutTime.dateObj = new Date(user.checkOutTime.dateObj);
+        user.elapsedTime.dateObj = new Date(user.elapsedTime.dateObj);
+      }
+    );
   }
   return data;
 }
