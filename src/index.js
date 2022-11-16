@@ -15,7 +15,7 @@
 // import { getDatabase, ref, set, child, get, Database, remove, onChildChanged, DataSnapshot } from 'firebase/database';
 // import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 /* Using browser modules for now... please do not delete above */
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js";
 import {
   getDatabase,
   ref,
@@ -26,25 +26,25 @@ import {
   onChildChanged,
   onChildRemoved,
   remove,
-} from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js';
+} from "https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js";
 /* For login */
 import {
   getAuth,
   signInWithPopup,
   GoogleAuthProvider,
-} from 'https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js';
+} from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
 
-import { user } from './classes.js';
+import { user, userGetElapsedTime, userSetCheckInTime, userSetCheckOutTime} from "./classes.js";
 // import the walker object here!
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyD4ER15Ypc7TCAXGlt_1tvmXEuLpXal14k',
-  authDomain: 'safewalkscu.firebaseapp.com',
-  databaseURL: 'https://safewalkscu-default-rtdb.firebaseio.com',
-  projectId: 'safewalkscu',
-  storageBucket: 'safewalkscu.appspot.com',
-  messagingSenderId: '558548226148',
-  appId: '1:558548226148:web:01051d9600a5174e9ecf71',
+  apiKey: "AIzaSyD4ER15Ypc7TCAXGlt_1tvmXEuLpXal14k",
+  authDomain: "safewalkscu.firebaseapp.com",
+  databaseURL: "https://safewalkscu-default-rtdb.firebaseio.com",
+  projectId: "safewalkscu",
+  storageBucket: "safewalkscu.appspot.com",
+  messagingSenderId: "558548226148",
+  appId: "1:558548226148:web:01051d9600a5174e9ecf71",
 };
 
 /**
@@ -63,19 +63,18 @@ const db = getDatabase();
  *
  */
 const MAX_WALKER_COUNT = 5;
-const userToken = ['a', 'b', 'c'];
-const adminToken = ['d'];
-const walkerToken = ['e'];
+const userToken = ["a", "b", "c"];
+const adminToken = ["d"];
+const walkerToken = ["e"];
 const dbRef = ref(getDatabase());
 const emptyElements = cloneEmptyElements();
-let globalUserData;
+let globalUserData = {};
 
 /**
  * @function initializeData
  * @brief Asynchronously retrieves user info from the database from /users
- *        directory. Currently stores up to 5 students in an array for
- *        testing. And also to potentially save bandwidth.
- *
+ *        directory and stores into globalUserData. The key is the 'assigned'
+ *        and 'unassigned.' The value stores the object by token id.
  * */
 function initializeData() {
   /* This creates a new promise object which can be either be resolved
@@ -85,28 +84,28 @@ function initializeData() {
      parameter in Promise.prototype.then().
      If a promise fails, then it will skip the .then and go to .catch. */
   let userData = new Promise(function (resolve, reject) {
-    /** 
+    /**
      * @function get
      * @param {DataSnapshot} snapshot
      *  The get() is a firebase function which takes in two params.
-     *  1. the databaseReference 
-     *  2. the path where the database is located. The child() will 
-     *     give us the subpath of /users/<this>. 
-   */
-    return get(child(dbRef, 'users/'))
+     *  1. the databaseReference
+     *  2. the path where the database is located. The child() will
+     *     give us the subpath of /users/<this>.
+     */
+    return get(child(dbRef, "users/"))
       .then((snapshot) => {
         if (snapshot.exists()) {
           let obj = {};
-          if (snapshot.hasChild('assigned')){
-            obj['assigned'] = snapshot.child('assigned').val()
+          if (snapshot.hasChild("assigned")) {
+            obj["assigned"] = snapshot.child("assigned").val();
           }
-          if (snapshot.hasChild('unassigned')){
-            obj['unassigned'] = snapshot.child('unassigned').val();
+          if (snapshot.hasChild("unassigned")) {
+            obj["unassigned"] = snapshot.child("unassigned").val();
           }
           /* Promise is resolved here.  */
           resolve(obj);
         } else {
-          console.log('No data available');
+          console.log("No data available");
           clearAllTables();
         }
       })
@@ -123,12 +122,13 @@ function initializeData() {
        //// Call fillTable() here. 
     */
     /* Make a global user data... */
+    /* First and foremost we convert necessary properties to objects. */
+    data = stringToDateObj(data);
     globalUserData = data;
-    fillUnassignedTable(data['unassigned']);
-    fillAssignedTable(data['assigned']);
-    onChildChanged(dbRef, initializeData );
+    fillUnassignedTable(data["unassigned"]);
+    fillAssignedTable(data["assigned"]);
+    onChildChanged(dbRef, initializeData);
     onChildRemoved(dbRef, initializeData);
-
 
     return data;
   });
@@ -145,7 +145,7 @@ function writeUserData(user) {
      database, and we can do so initializing it with a getDatabase() method.
   */
   set(
-    ref(db, `users/${user.assigned ? 'assigned' : 'unassigned'}/` + user.token),
+    ref(db, `users/${user.assigned ? "assigned" : "unassigned"}/` + user.token),
     {
       token: user.token,
       name: user.name,
@@ -167,9 +167,14 @@ function writeUserData(user) {
         hour: user.checkInTime.hour,
         minute: user.checkInTime.minute,
       },
+      elapsedTime: {
+        dateObj: user.elapsedTime.dateObj.toString(),
+        hour: user.elapsedTime.hour,
+        minute: user.elapsedTime.minute,
+      },
       pairedWalkers: {
-        walker1: user.pairedWalkers.walker1,
-        walker2: user.pairedWalkers.walker2,
+        walker1Token: user.pairedWalkers.walker1Token,
+        walker2Token: user.pairedWalkers.walker2Token,
       },
       assigned: user.assigned,
     }
@@ -183,7 +188,7 @@ function writeUserData(user) {
  * database path `/walkers/<authorizationToken>`.
  * */
 function writeWalkerData(user) {
-  set(ref(db, 'walkers/' + walkerToken[2]), {
+  set(ref(db, "walkers/" + walkerToken[2]), {
     token: user.token,
     name: user.name,
     email: user.email,
@@ -252,52 +257,61 @@ async function main() {
   /* initializeData is async. That means user data will be undefined
      until the data is completely retrieved. */
   let fields = {
-    userToken: ['a', 'b', 'c', 'd'],
-    names: ['Jodi', 'Marty', 'Kristina', 'Shamwow'],
+    userToken: ["a", "b", "c", "d"],
+    names: ["Jodi", "Marty", "Kristina", "Shamwow"],
     emails: [
-      'Jodi@scu.edu',
-      'Marty@scu.edu',
-      'Kristina@scu.edu',
-      'shamwow@scu.edu',
+      "Jodi@scu.edu",
+      "Marty@scu.edu",
+      "Kristina@scu.edu",
+      "shamwow@scu.edu",
     ],
     phoneNumbers: [
-      '626-321-4212',
-      '503-421-2451',
-      '322-323-3543',
-      '434-434-4652',
+      "626-321-4212",
+      "503-421-2451",
+      "322-323-3543",
+      "434-434-4652",
     ],
     srcAddressL1: [
-      '324 Villa Rd',
-      '322 Country Rd',
-      '523 New York Ave',
-      '242 Camino Rd',
+      "324 Villa Rd",
+      "322 Country Rd",
+      "523 New York Ave",
+      "242 Camino Rd",
     ],
     dstAddressL1: [
-      '423 El Camino Rd',
-      '322 DownTown Ave',
-      '234 Vickie Ave',
-      '234 Marengo Ave',
+      "423 El Camino Rd",
+      "322 DownTown Ave",
+      "234 Vickie Ave",
+      "234 Marengo Ave",
     ],
     assigned: [false, false, false, true],
   };
-  let arr = [];
-  for (let i = 0; i < 4; i++) {
-    let user1 = new user(
-      fields.userToken[i],
-      fields.names[i],
-      fields.emails[i],
-      fields.phoneNumbers[i],
-      fields.srcAddressL1[i],
-      '',
-      fields.dstAddressL1[i]
-    );
-    user1.assigned = fields.assigned[i];
-    arr.push(user1);
-    writeUserData(user1);
-  }
+  // let arr = [];
+  // for (let i = 0; i < 4; i++) {
+  //   let user1 = new user(
+  //     fields.userToken[i],
+  //     fields.names[i],
+  //     fields.emails[i],
+  //     fields.phoneNumbers[i],
+  //     fields.srcAddressL1[i],
+  //     "",
+  //     fields.dstAddressL1[i]
+  //   );
+  //   user1.assigned = fields.assigned[i];
+  //   user1 = userSetCheckInTime(user1);
+  //   arr.push(user1);
+  //   writeUserData(user1);
+  // }
   initializeData();
-  // setTimeout( ()=> moveToAssigned('a') , 30000);
+  // const user1 = new user('e','sam','xxx@gmail.com','312-321-1231',
+  // 'vickie ave','','el camino rd',);
+  // user1.assigned = true;
+  // writeUserData(user1);
+  setInterval(function() {
+    console.log('Refreshing table...');
+    initializeData();
+}, 60 * 1000); // 60 * 1000 milsec
 }
+
 
 main();
 /**
@@ -310,9 +324,9 @@ main();
  * */
 function fillUnassignedTable(data) {
   /* 1. First, create a table row and create a reference to the tbody.*/
-  const tbody = document.querySelectorAll('.new-requests>tbody')[0];
+  const tbody = document.querySelectorAll(".new-requests>tbody")[0];
   const tr = tbody.children[0];
-  if (typeof data === 'undefined') {
+  if (typeof data === "undefined") {
     clearUnassignedTable();
     return;
   }
@@ -327,7 +341,7 @@ function fillUnassignedTable(data) {
   });
   /* 3. Create data's number of rows. */
   for (let i = 0; i < dataSize; i++) {
-    const newRow = emptyElements['unassignedRow'].cloneNode(true);
+    const newRow = emptyElements["unassignedRow"].cloneNode(true);
     tbody.appendChild(newRow);
   }
   /* 3. Iterate through the userDataObjs, append new texts to the new 
@@ -340,19 +354,22 @@ function fillUnassignedTable(data) {
   let i = 0;
   for (const tr of tbody.children) {
     const user = Object.values(data)[i++];
-    tr.setAttribute('userToken', user.token);
-    tr.setAttribute('assigned', 'false');
+    tr.setAttribute("userToken", user.token);
+    tr.setAttribute("assigned", "false");
     tr.children[0].textContent =
       trailingZeroes(user.checkInTime.hour, 2) +
-      ':' +
+      ":" +
       trailingZeroes(user.checkInTime.minute, 2) +
-      'PM';
+      "PM";
     tr.children[1].textContent = user.name;
-    tr.children[2].textContent = user.addresses.srcAddressL1 + ' ';
+    tr.children[2].textContent = user.addresses.srcAddressL1 + " ";
     user.addresses.srcAddressL2;
-    tr.children[3].textContent = user.addresses.dstAddressL1 + ' ';
+    tr.children[3].textContent = user.addresses.dstAddressL1 + " ";
     user.addresses.dstAddressL2;
-    tr.children[tr.children.length - 1].addEventListener('click', deleteUserOnClick);
+    tr.children[tr.children.length - 1].addEventListener(
+      "click",
+      deleteUserOnClick
+    );
   }
 }
 
@@ -364,9 +381,9 @@ function fillUnassignedTable(data) {
  *        retrieved. Assigned
  * */
 function fillAssignedTable(data) {
-  const tbody = document.querySelectorAll('.new-requests>tbody')[1];
+  const tbody = document.querySelectorAll(".new-requests>tbody")[1];
   const tr = tbody.children[0];
-  if (typeof data === 'undefined') {
+  if (typeof data === "undefined") {
     clearAssignedTable();
     return;
   }
@@ -378,26 +395,33 @@ function fillAssignedTable(data) {
     node.remove();
   });
   for (let i = 0; i < dataSize; i++) {
-    const newRow = emptyElements['assignedRow'].cloneNode(true);
+    const newRow = emptyElements["assignedRow"].cloneNode(true);
     tbody.appendChild(newRow);
   }
+  
   let i = 0;
   for (const tr of tbody.children) {
-    const user = Object.values(data)[i++];
-    tr.setAttribute('userToken', user.token);
-    tr.setAttribute('assigned', true);
+    let user = Object.values(data)[i++];
+    // console.log(user);
+    const elapsedTime = userGetElapsedTime(user).elapsedTime;
+    // console.log(user.prototype.getElapsedTime());
+    tr.setAttribute("userToken", user.token);
+    tr.setAttribute("assigned", true);
     tr.children[0].textContent =
       trailingZeroes(user.checkInTime.hour, 2) +
       ":" +
       trailingZeroes(user.checkInTime.minute, 2) +
       "PM";
     tr.children[1].textContent = user.name;
-    tr.children[2].textContent = user.addresses.dstAddressL1 + ' ';
-    user.addresses.dstAddressL2;
+    tr.children[2].textContent = user.addresses.dstAddressL1 + " ";
     tr.children[3].textContent =
-      user.pairedWalkers.walker1 + ' & ' + user.pairedWalkers.walker2;
-    tr.children[4].textContent = 'TODO';
-    tr.children[tr.children.length - 1].addEventListener('click', deleteUserOnClick);
+      user.pairedWalkers.walker1Token + " & " + user.pairedWalkers.walker2Token;
+
+    tr.children[4].textContent = `${elapsedTime.minute} ${elapsedTime.minute > 1? 'mins':'min'}`; 
+    tr.children[tr.children.length - 1].addEventListener(
+      "click",
+      deleteUserOnClick
+    );
   }
 }
 
@@ -407,44 +431,44 @@ function fillAssignedTable(data) {
  * @function deleteUserOnClick
  * @param {Event} e
  * @brief A call back function which deletes a directory in firebase db
- *        containing user data. Grabs userToken from the id and assigned 
+ *        containing user data. Grabs userToken from the id and assigned
  *        attributes on the <td> elements from the parent element
  *        of td (the <tr>).
  */
 async function deleteUserOnClick(e) {
   console.log(`you clicked ${e.currentTarget}!!`);
-  const userToken = e.currentTarget.parentNode.getAttribute('userToken');
-  const assigned = e.currentTarget.parentNode.getAttribute('assigned');
+  const userToken = e.currentTarget.parentNode.getAttribute("userToken");
+  const assigned = e.currentTarget.parentNode.getAttribute("assigned");
 
   /* 1. Create a reference to the db with the given userToken. and get its 
         directory. */
   const path = `users/${
-    assigned === 'true' ? 'assigned' : 'unassigned'
+    assigned === "true" ? "assigned" : "unassigned"
   }/${userToken}`;
   console.log(path);
   const target = ref(db, path);
   /* 2. Call the firebase remove() */
   remove(target);
-  alert('user has been deleted!');
+  alert("user has been deleted!");
 
   initializeData();
 }
 
 /**
  * @function deleteUserByToken
- * @param {String} userToken 
- * @param {Boolean} assigned 
+ * @param {String} userToken
+ * @param {Boolean} assigned
  * @param {Boolean} action by default 'deleted. 'Moved' otherwise.
  * @brief Deletes a user by given userToken and assigned/unassigned status.
  *        Alternative to using AddEventListener 'click' event.
  */
 async function deleteUserByToken(userToken, assigned, deleted = true) {
   const path = `users/${
-    assigned === 'true' ? 'assigned' : 'unassigned'
-                       }/${userToken}`;
+    assigned === "true" ? "assigned" : "unassigned"
+  }/${userToken}`;
   console.log(path);
   remove(ref(db, path));
-  deleted ? alert('user has been deleted!') : alert('user has been moved!');
+  deleted ? alert("user has been deleted!") : alert("user has been moved!");
 
   initializeData();
 }
@@ -499,7 +523,7 @@ function clearAssignedTable() {
  * @function clearAllTables
  * @brief Clears all tables on this page.
  */
-function clearAllTables(){
+function clearAllTables() {
   clearAssignedTable();
   clearUnassignedTable();
 }
@@ -522,12 +546,12 @@ function resetTbodyStyle(node){
 /* //! ======================== MOVE ACTION ============================ */
 /**
  * @function moveToAssigned
- * @param {String} userToken 
+ * @param {String} userToken
  * Takes a userToken to move the corresponding row into the assigned table.
  */
-function moveToAssigned(userToken){
-  let newAssignedUser = globalUserData['unassigned'][userToken];
-  if (typeof (newAssignedUser) === 'undefined' ){
+function moveToAssigned(userToken) {
+  let newAssignedUser = globalUserData["unassigned"][userToken];
+  if (typeof newAssignedUser === "undefined") {
     return;
   }
   /* Delete the existing unassigned data. */
@@ -546,7 +570,7 @@ function moveToAssigned(userToken){
  *          {howMany} decimal places.
  */
 function trailingZeroes(number, howMany) {
-  const str = number.toLocaleString('en-US', {
+  const str = number.toLocaleString("en-US", {
     minimumIntegerDigits: howMany,
     useGrouping: false,
   });
@@ -558,7 +582,7 @@ function trailingZeroes(number, howMany) {
  * @returns an array of row tbody elements/Nodes
  * @brief Used to generate a empty row elements to be cloned dynamically
  *        using Node.cloneNode(true). The array has the following elems:
- *        arr[0] = unassignedRow 
+ *        arr[0] = unassignedRow
  *        arr[1] = assignedRow
  *        arr[2] = ...
  *        arr[3] = ...
@@ -566,20 +590,55 @@ function trailingZeroes(number, howMany) {
 function cloneEmptyElements() {
   /* For Unassigned Table Row */
   let arr = [];
-  let row1 = document.querySelector('tbody').children[0];
+  let row1 = document.querySelector("tbody").children[0];
   let newRow1 = row1.cloneNode(true);
   for (let i = 0; i < 4; i++) {
-    newRow1.children[i].textContent = '';
+    newRow1.children[i].textContent = "";
   }
-  arr['unassignedRow'] = newRow1;
+  arr["unassignedRow"] = newRow1;
 
   /* For assigned Table Row */
-  let row2 = document.querySelectorAll('tbody')[1].children[0];
+  let row2 = document.querySelectorAll("tbody")[1].children[0];
   let newRow2 = row2.cloneNode(true);
   for (let i = 0; i < 5; i++) {
-    newRow2.children[i].textContent = '';
+    newRow2.children[i].textContent = "";
   }
-  arr['assignedRow'] = newRow2;
+  arr["assignedRow"] = newRow2;
 
   return arr;
+}
+/**
+ * @function stringToDateObj
+ * @param {Object} data 
+ * @returns new data object with JSON components
+ * @brief Converts string to JSON for necessary properties, such as Dates
+ *        Geolocation.
+ */
+function stringToDateObj(data){
+  if (typeof data['unassigned'] !== 'undefined'){
+    Object.values(data['unassigned']).forEach(
+      /**
+     * @param {user} user
+     */
+      function (user) {
+      user.checkInTime.dateObj = new Date(user.checkInTime.dateObj);
+      user.checkOutTime.dateObj = new Date(user.checkInTime.dateObj);
+      user.elapsedTime.dateObj = new Date(user.checkInTime.dateObj);
+    })
+  }
+  if (typeof data['assigned'] !== 'undefined'){
+    Object.values(data['assigned']).forEach(
+      /**
+     * @param {user} user
+     */
+      function (user) {
+  
+      user.checkInTime.dateObj = new Date(user.checkInTime.dateObj);
+      user.checkOutTime.dateObj = new Date(user.checkOutTime.dateObj);
+      user.elapsedTime.dateObj = new Date(user.elapsedTime.dateObj);
+      
+    })
+
+  }
+  return data;
 }
