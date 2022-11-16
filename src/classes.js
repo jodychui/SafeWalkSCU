@@ -1,12 +1,3 @@
-/* objects as 'classes' 
-Admin should be able to store  */
-/* class Admin {
-    constructor (email, addWalker, removeWalker, 
-        createPair, removePair, editPairs, 
-        deleteRequest, assignWalker);
-    }
-    */
-
 function user(
   token,
   name,
@@ -56,17 +47,31 @@ function user(
 /**
  * @function userGetElapsedTime
  * @param {user} userObj
- * @returns elapsedTime object
- * @brief
+ * @return elapsedTime object
+ * @brief Retrieves the user elapsed time as an object and stores into its 
+ * checkInTime property. 
+ * @precondition The user check in time has already been recorded by calling
+ *               userCheckInTime().
  */
 const userGetElapsedTime = function (userObj) {
   let difference = new Date(new Date() - userObj.checkInTime.dateObj);
   /* Okay, I have no idea why but by default hours is getting
      set to 16, even though it should be 0. */
-  userObj.elapsedTime.hour = difference.getHours() - 16;
-  userObj.elapsedTime.minute = difference.getMinutes();
+  const obj = {
+    dateObj: difference,
+    hour: difference.getHours() - 16,
+    minute: difference.getMinutes(),
+  }
+  userObj.elapsedTime = obj;
+  return obj;
 };
 
+/**
+ * @function
+ * @param {user} userObj 
+ * @brief Initializes the user check in time as an object and stores into its 
+ * checkOutTime property.
+ */
 const userSetCheckOutTime = function (userObj) {
   const d = new Date();
   const obj = {
@@ -79,6 +84,12 @@ const userSetCheckOutTime = function (userObj) {
   userObj.checkOutTime = obj;
 };
 
+/**
+ * @function userSetCheckInTime
+ * @param {user} userObj 
+ * @brief Initializes the user check in time as an object and stores into its 
+ * checkInTime property.
+ */
 const userSetCheckInTime = function (userObj) {
   const d = new Date();
   const obj = {

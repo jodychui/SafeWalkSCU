@@ -78,8 +78,8 @@ let globalUserData = {};
 /**
  * @function initializeData
  * @brief Asynchronously retrieves user info from the database from /users
- *        directory and stores into globalUserData. The key is the 'assigned'
- *        and 'unassigned.' The value stores the object by token id.
+ *        directory, stores into globalUserData and update the tables, and 
+ *        add event listeners to the firebase database to listen for changes.
  * */
 function initializeData() {
   /* This creates a new promise object which can be either be resolved
@@ -119,19 +119,13 @@ function initializeData() {
         console.error(error);
       });
   });
-  /**
-   * Upon a resolved promise, the array of students
-   * */
   userData.then(function (data) {
-    /* //// Do stuff here with the data.
-       //// Call fillTable() here. 
-    */
     /* Make a global user data... */
     /* First and foremost we convert necessary properties to objects. */
-    stringToDateObj(data);
     globalUserData = data;
-    fillUnassignedTable(data["unassigned"]);
-    fillAssignedTable(data["assigned"]);
+    stringToJSON(globalUserData);
+    fillUnassignedTable(globalUserData["unassigned"]);
+    fillAssignedTable(globalUserData["assigned"]);
     onChildChanged(dbRef, initializeData);
     onChildRemoved(dbRef, initializeData);
 
@@ -162,23 +156,9 @@ function writeUserData(user) {
         dstAddressL1: user.addresses.dstAddressL1,
         dstAddressL2: user.addresses.dstAddressL2,
       },
-      checkInTime: {
-        dateObj: user.checkInTime.dateObj.toString(),
-        hour: user.checkInTime.hour,
-        minute: user.checkInTime.minute,
-        meridiem: user.checkInTime.meridiem,
-      },
-      checkOutTime: {
-        dateObj: user.checkOutTime.dateObj.toString(),
-        hour: user.checkInTime.hour,
-        minute: user.checkInTime.minute,
-        meridiem: user.checkInTime.meridiem,
-      },
-      elapsedTime: {
-        dateObj: user.elapsedTime.dateObj.toString(),
-        hour: user.elapsedTime.hour,
-        minute: user.elapsedTime.minute,
-      },
+      checkInTime: user.checkInTime.dateObj.toString(),
+      checkOutTime: user.checkOutTime.dateObj.toString(),
+      elapsedTime: user.elapsedTime.dateObj.toString(),
       pairedWalkers: {
         walker1Token: user.pairedWalkers.walker1Token,
         walker2Token: user.pairedWalkers.walker2Token,
@@ -311,22 +291,23 @@ async function main() {
   // const user1 = new user('e','Maxine','Maxine@ucsd.edu','312-321-1231',
   // 'Oreo ave','','el camino rd');
   // user1.assigned = true;
-  // userSetCheckInTime(user1);
+  // writeUserData(user1);
+
   initializeData();
   setInterval(function () {
     console.log("Refreshing table...");
     initializeData();
-  }, 60 * 1000); // 60 * 1000 milsec
+  }, 60 * 1000); 
 }
 
 main();
 /**
  * @function fillUnassignedTable
  * @param { user } data
- * @brief Fills the tables in the requests page (index.html).
+ * @brief Fills the information in the tables in the requests page (index.html).
  *        This function should be called by the fill table.
- *        Note that the data is an array of two objects.
- *        1. Assigned user objs and 2. Unassigned user objs.
+ * @precondition The data must have been converted to a JS Object, including 
+ *               the time and geolocation.
  * */
 function fillUnassignedTable(data) {
   /* 1. First, create a table row and create a reference to the tbody.*/
@@ -382,9 +363,9 @@ function fillUnassignedTable(data) {
 /**
  * @function fillAssignedTable
  * @param { user } data
- * @brief fills the tables in the requests page (index.html).
- *        This function should be called once the data is successfully
- *        retrieved. Assigned
+ * @brief Fills the tables in the requests page (index.html).
+ * @precondition The data must have been converted to a JS Object, including 
+ *               the time and geolocation.
  * */
 function fillAssignedTable(data) {
   const tbody = document.querySelectorAll(".new-requests>tbody")[1];
@@ -615,22 +596,48 @@ function cloneEmptyElements() {
   return arr;
 }
 /**
- * @function stringToDateObj
+ * @function stringToJSON
  * @param {Object} data
  * @returns new data object with JSON components
  * @brief Converts string to JSON for necessary properties, such as Dates
- *        Geolocation.
+ *        Geolocation. This will create checkInTime, checkOutTime,
+ *        and elapsedTime JS objects.
+ * @precondition The data must be an object of two keys: 'assigned' and
+ *              'unassigned.'
  */
-function stringToDateObj(data) {
+function stringToJSON(data) {
   if (typeof data["unassigned"] !== "undefined") {
     Object.values(data["unassigned"]).forEach(
       /**
        * @param {user} user
        */
       function (user) {
-        user.checkInTime.dateObj = new Date(user.checkInTime.dateObj);
-        user.checkOutTime.dateObj = new Date(user.checkInTime.dateObj);
-        user.elapsedTime.dateObj = new Date(user.checkInTime.dateObj);
+        /* Extract values for the checkInTime to an object... */
+        let dateObj = new Date(user.checkInTime);
+        const checkInTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+        };
+        user.checkInTime = checkInTime;
+
+        dateObj = new Date(user.checkOutTime);
+        const checkOutTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+        };
+        user.checkOutTime = checkOutTime;
+
+        dateObj = new Date(user.elapsedTime);
+        const elapsedTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+        };
+        user.elapsedTime = elapsedTime;
       }
     );
   }
@@ -639,10 +646,33 @@ function stringToDateObj(data) {
       /**
        * @param {user} user
        */
-      function (user) {
-        user.checkInTime.dateObj = new Date(user.checkInTime.dateObj);
-        user.checkOutTime.dateObj = new Date(user.checkOutTime.dateObj);
-        user.elapsedTime.dateObj = new Date(user.elapsedTime.dateObj);
+       function (user) {
+        /* Extract values for the checkInTime to an object... */
+        let dateObj = new Date(user.checkInTime);
+        const checkInTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+        };
+        user.checkInTime = checkInTime;
+
+        dateObj = new Date(user.checkOutTime);
+        const checkOutTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+        };
+        user.checkOutTime = checkOutTime;
+
+        dateObj = new Date(user.elapsedTime);
+        const elapsedTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+        };
+        user.elapsedTime = elapsedTime;
       }
     );
   }
