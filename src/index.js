@@ -25,6 +25,7 @@ import {
   limitToFirst,
   onChildChanged,
   onChildRemoved,
+  onChildAdded,
   remove,
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-database.js";
 /* For login */
@@ -61,6 +62,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const db = getDatabase();
+
 // const userId = auth.currentUser.uid;
 
 /**
@@ -73,6 +75,9 @@ const adminToken = ["d"];
 const walkerToken = ["e"];
 const dbRef = ref(getDatabase());
 const emptyElements = cloneEmptyElements();
+onChildAdded(dbRef, initializeData);
+onChildChanged(dbRef, initializeData);
+onChildRemoved(dbRef, initializeData);
 let globalUserData = {};
 
 /**
@@ -111,6 +116,9 @@ function initializeData() {
           resolve(obj);
         } else {
           console.log("No data available");
+          /* If the user list is empty, then set it to empty object to let 
+             the clearAllTables handle the empty objects. */
+          globalUserData = {};
           clearAllTables();
         }
       })
@@ -124,11 +132,11 @@ function initializeData() {
     /* First and foremost we convert necessary properties to objects. */
     globalUserData = data;
     stringToJSON(globalUserData);
+    
     fillUnassignedTable(globalUserData["unassigned"]);
     fillAssignedTable(globalUserData["assigned"]);
-    onChildChanged(dbRef, initializeData);
-    onChildRemoved(dbRef, initializeData);
-
+  
+    showLastRefreshed();
     return data;
   });
 }
@@ -273,7 +281,7 @@ async function main() {
     assigned: [false, false, false, true],
   };
   // let arr = [];
-  // for (let i = 0; i < 4; i++) {
+  // for (let i = 0; i < 3; i++) {
   //   let user1 = new user(
   //     fields.userToken[i],
   //     fields.names[i],
@@ -288,16 +296,14 @@ async function main() {
   //   arr.push(user1);
   //   writeUserData(user1);
   // }
-  // const user1 = new user('e','Maxine','Maxine@ucsd.edu','312-321-1231',
-  // 'Oreo ave','','el camino rd');
+  // const user1 = new user('f','shamwow','shamwow@ucsd.edu','341-321-1231',
+  // 'Shammy ave','','el camino rd');
   // user1.assigned = true;
   // writeUserData(user1);
 
   initializeData();
-  setInterval(function () {
-    console.log("Refreshing table...");
-    initializeData();
-  }, 60 * 1000); 
+  setTableRefresh(1);
+ 
 }
 
 main();
@@ -400,8 +406,7 @@ function fillAssignedTable(data) {
     )} ${user.checkInTime.meridiem}`;
     tr.children[1].textContent = user.name;
     tr.children[2].textContent = user.addresses.dstAddressL1 + " ";
-    tr.children[3].textContent =
-      user.pairedWalkers.walker1Token + " & " + user.pairedWalkers.walker2Token;
+    tr.children[3].textContent = 'TODO';
     tr.children[4].textContent = `${user.elapsedTime.hour} ${
       user.elapsedTime.hour > 1 ? "hours" : "hour"
     } ${user.elapsedTime.minute} ${
@@ -521,8 +526,8 @@ function clearAllTables() {
  * @function resetTbodyStyle
  * @param {Node} node
  * @brief Resets the table body element back to how it was. Can be called
- *        when resetting properties set by @function clearUnassignedTable
- *        or @function clearAssignedTable
+ *        when resetting properties set by clearUnassignedTable()
+ *        or clearAssignedTable()
  */
 function resetTbodyStyle(node) {
   node.style.removeProperty("display");
@@ -530,6 +535,21 @@ function resetTbodyStyle(node) {
   node.style.removeProperty("padding");
   node.textContent = "";
 }
+/* //! ======================== STYLES =================================*/
+function showLastRefreshed(){
+  const p = document.querySelector('#last-refreshed');
+  if ( p !== null){
+    p.textContent = `Data last updated: ${new Date().toString()}`;
+    return;
+  }
+  let tableSection = document.querySelector('.col.pt-4');  
+  const lastUpdatedMsg = document.createElement('p');
+  lastUpdatedMsg.textContent = `Data last updated: ${new Date().toString()}`;
+  lastUpdatedMsg.setAttribute('id', 'last-refreshed');
+  lastUpdatedMsg.setAttribute('style','text-align: center; font-size: smaller');
+  tableSection.appendChild(lastUpdatedMsg);
+}
+
 
 /* //! ======================== MOVE ACTION ============================ */
 /**
@@ -677,4 +697,18 @@ function stringToJSON(data) {
     );
   }
   return data;
+}
+
+/* //! ======================== PAGE ERROR HANDLING =========================  */  
+/**
+ * @function setTableRefresh
+ * @param {Number} rate refresh rate in seconds
+ * @brief Sets the table refresh interval of given rate, if a network is available.
+ */
+function setTableRefresh(rate) {
+  const intervalID = setInterval(function () {
+    
+    fillAssignedTable(globalUserData["assigned"]);
+    fillUnassignedTable(globalUserData["unassigned"]);
+  }, rate * 1000);
 }
