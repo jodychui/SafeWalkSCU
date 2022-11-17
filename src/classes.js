@@ -65,6 +65,24 @@ const userGetElapsedTime = function (userObj) {
   return obj;
 };
 
+/** 
+ * @function userGetCheckInTime
+ * @param {user} userObj 
+*/
+const userGetCheckInTime = function (userObj) {
+  const d = new Date(userObj.checkInTime.dateObj);
+  const obj = {
+    dateObj: d /* In case we need to perform date 
+                                   arithmetics, such as getElapsedTime() */,
+    hour: (d.getHours() % 12  === 0) ? 12 : d.getHours() % 12,
+    minute: d.getMinutes(),
+    meridiem: d.getHours() / 12 > 1 ? "PM" : "AM",
+  };
+  
+  userObj.checkInTime = obj;
+};
+
+
 /**
  * @function
  * @param {user} userObj
@@ -76,9 +94,6 @@ const userSetCheckOutTime = function (userObj) {
   const obj = {
     dateObj: d /* In case we need to perform date 
                                    arithmetics, such as getElapsedTime() */,
-    // hour: d.getHours() % 12 === 0 ? 12 : d.getHours() % 12,
-    // minute: d.getMinutes(),
-    // meridiem: d.getHours() / 12 > 1 ? "PM" : "AM",
   };
   userObj.checkOutTime = obj;
 };
@@ -94,12 +109,11 @@ const userSetCheckInTime = function (userObj) {
   const obj = {
     dateObj: d /* In case we need to perform date 
                                    arithmetics, such as getElapsedTime() */,
-    // hour: (d.getHours() % 12 === 0) ? 12 : d.getHours() % 12,
-    // minute: d.getMinutes(),
-    // meridiem: d.getHours() / 12 > 1 ? "PM" : "AM",
-  };
   
+  };
   userObj.checkInTime = obj;
 };
 
-export { user, userGetElapsedTime, userSetCheckInTime, userSetCheckOutTime };
+
+
+export { user, userGetElapsedTime, userSetCheckInTime, userSetCheckOutTime, userGetCheckInTime };

@@ -38,8 +38,10 @@ import {
 import {
   user,
   userGetElapsedTime,
+  userGetCheckInTime,
   userSetCheckInTime,
   userSetCheckOutTime,
+  
 } from "./classes.js";
 
 import { walker } from "./walker.js";
@@ -295,7 +297,7 @@ async function main() {
     userSetCheckInTime(user1);
 
     arr.push(user1);
-    writeUserData(user1);
+    // writeUserData(user1);
   }
   const user1 = new user(
     "f",
@@ -307,8 +309,8 @@ async function main() {
     "el camino rd"
   );
   user1.assigned = true;
-  userSetCheckInTime(user1);
-  writeUserData(user1);
+  // userSetCheckInTime(user1);
+  // writeUserData(user1);
 
   initializeData();
   setTableRefresh(1);
@@ -405,6 +407,7 @@ function fillAssignedTable(data) {
     let user = Object.values(data)[i++];
     // console.log(user);
     userGetElapsedTime(user);
+    userGetCheckInTime(user);
     tr.setAttribute("userToken", user.token);
     tr.setAttribute("assigned", true);
     tr.children[0].textContent = `
