@@ -35,7 +35,6 @@ import {
   GoogleAuthProvider,
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
 
-
 import {
   user,
   userGetElapsedTime,
@@ -87,7 +86,7 @@ let globalUserData = {};
 /**
  * @function initializeData
  * @brief Asynchronously retrieves user info from the database from /users
- *        directory, stores into globalUserData and update the tables, and 
+ *        directory, stores into globalUserData and update the tables, and
  *        add event listeners to the firebase database to listen for changes.
  * */
 function initializeData() {
@@ -136,10 +135,10 @@ function initializeData() {
     /* First and foremost we convert necessary properties to objects. */
     globalUserData = data;
     stringToJSON(globalUserData);
-    
+
     fillUnassignedTable(globalUserData["unassigned"]);
     fillAssignedTable(globalUserData["assigned"]);
-  
+
     showLastRefreshed();
     return data;
   });
@@ -189,18 +188,24 @@ function writeUserData(user) {
  * */
 
 function writeWalkerData(walker) {
-  const db = getDatabase();//get reference to database
-  set(ref(db, `walkers/${walker.onWalk ? 'unavailable' : 'available'}/` + walkerToken[0]), {
-    token: walker.token,
-    name: walker.name,
-    email: walker.email,
-    phoneNumber: walker.phoneNumber,
-    available: walker.onDuty && !walker.onWalk,//!!check this
-    unavailable: !walker.onDuty || walker.onWalk,
-    pairedWith: walker.pairedWith,
-    currentLocation: walker.currentLocation,
-    completedWalk: walker.completedWalk
-  });
+  const db = getDatabase(); //get reference to database
+  set(
+    ref(
+      db,
+      `walkers/${walker.onWalk ? "unavailable" : "available"}/` + walkerToken[0]
+    ),
+    {
+      token: walker.token,
+      name: walker.name,
+      email: walker.email,
+      phoneNumber: walker.phoneNumber,
+      available: walker.onDuty && !walker.onWalk, //!!check this
+      unavailable: !walker.onDuty || walker.onWalk,
+      pairedWith: walker.pairedWith,
+      currentLocation: walker.currentLocation,
+      completedWalk: walker.completedWalk,
+    }
+  );
 }
 
 /**
@@ -275,30 +280,38 @@ async function main() {
     ],
     assigned: [false, false, false, true],
   };
-  // let arr = [];
-  // for (let i = 0; i < 3; i++) {
-  //   let user1 = new user(
-  //     fields.userToken[i],
-  //     fields.names[i],
-  //     fields.emails[i],
-  //     fields.phoneNumbers[i],
-  //     fields.srcAddressL1[i],
-  //     "",
-  //     fields.dstAddressL1[i]
-  //   );
-  //   user1.assigned = fields.assigned[i];
-  //   userSetCheckInTime(user1);
-  //   arr.push(user1);
-  //   writeUserData(user1);
-  // }
-  // const user1 = new user('f','shamwow','shamwow@ucsd.edu','341-321-1231',
-  // 'Shammy ave','','el camino rd');
-  // user1.assigned = true;
-  // writeUserData(user1);
+  let arr = [];
+  for (let i = 0; i < 3; i++) {
+    let user1 = new user(
+      fields.userToken[i],
+      fields.names[i],
+      fields.emails[i],
+      fields.phoneNumbers[i],
+      fields.srcAddressL1[i],
+      "",
+      fields.dstAddressL1[i]
+    );
+    user1.assigned = fields.assigned[i];
+    userSetCheckInTime(user1);
+
+    arr.push(user1);
+    writeUserData(user1);
+  }
+  const user1 = new user(
+    "f",
+    "shamwow",
+    "shamwow@ucsd.edu",
+    "341-321-1231",
+    "Shammy ave",
+    "",
+    "el camino rd"
+  );
+  user1.assigned = true;
+  userSetCheckInTime(user1);
+  writeUserData(user1);
 
   initializeData();
   setTableRefresh(1);
- 
 }
 
 main();
@@ -307,7 +320,7 @@ main();
  * @param { user } data
  * @brief Fills the information in the tables in the requests page (index.html).
  *        This function should be called by the fill table.
- * @precondition The data must have been converted to a JS Object, including 
+ * @precondition The data must have been converted to a JS Object, including
  *               the time and geolocation.
  * */
 function fillUnassignedTable(data) {
@@ -365,7 +378,7 @@ function fillUnassignedTable(data) {
  * @function fillAssignedTable
  * @param { user } data
  * @brief Fills the tables in the requests page (index.html).
- * @precondition The data must have been converted to a JS Object, including 
+ * @precondition The data must have been converted to a JS Object, including
  *               the time and geolocation.
  * */
 function fillAssignedTable(data) {
@@ -401,12 +414,18 @@ function fillAssignedTable(data) {
     )} ${user.checkInTime.meridiem}`;
     tr.children[1].textContent = user.name;
     tr.children[2].textContent = user.addresses.dstAddressL1 + " ";
-    tr.children[3].textContent = 'TODO';
-    tr.children[4].textContent = `${user.elapsedTime.hour} ${
-      user.elapsedTime.hour > 1 ? "hours" : "hour"
-    } ${user.elapsedTime.minute} ${
-      user.elapsedTime.minute > 1 ? "mins" : "min"
-    }`;
+    tr.children[3].textContent = "TODO";
+    if (user.elapsedTime.day >= 1){
+      tr.children[4].textContent = `> ${user.elapsedTime.day} days`
+    }
+    else{
+      tr.children[4].textContent = `${user.elapsedTime.hour} ${
+        
+          user.elapsedTime.hour > 1 ? "hours" : "hour"
+      } ${user.elapsedTime.minute} ${
+        user.elapsedTime.minute > 1 ? "mins" : "min"
+      }`;
+    }
     tr.children[tr.children.length - 1].addEventListener(
       "click",
       deleteUserOnClick
@@ -531,20 +550,22 @@ function resetTbodyStyle(node) {
   node.textContent = "";
 }
 /* //! ======================== STYLES =================================*/
-function showLastRefreshed(){
-  const p = document.querySelector('#last-refreshed');
-  if ( p !== null){
+function showLastRefreshed() {
+  const p = document.querySelector("#last-refreshed");
+  if (p !== null) {
     p.textContent = `Data last updated: ${new Date().toString()}`;
     return;
   }
-  let tableSection = document.querySelector('.col.pt-4');  
-  const lastUpdatedMsg = document.createElement('p');
+  let tableSection = document.querySelector(".col.pt-4");
+  const lastUpdatedMsg = document.createElement("p");
   lastUpdatedMsg.textContent = `Data last updated: ${new Date().toString()}`;
-  lastUpdatedMsg.setAttribute('id', 'last-refreshed');
-  lastUpdatedMsg.setAttribute('style','text-align: center; font-size: smaller');
+  lastUpdatedMsg.setAttribute("id", "last-refreshed");
+  lastUpdatedMsg.setAttribute(
+    "style",
+    "text-align: center; font-size: smaller"
+  );
   tableSection.appendChild(lastUpdatedMsg);
 }
-
 
 /* //! ======================== MOVE ACTION ============================ */
 /**
@@ -631,7 +652,7 @@ function stringToJSON(data) {
         let dateObj = new Date(user.checkInTime);
         const checkInTime = {
           dateObj: dateObj,
-          hour: dateObj.getHours() % 12,
+          hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
           minute: dateObj.getMinutes(),
           meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
         };
@@ -640,7 +661,7 @@ function stringToJSON(data) {
         dateObj = new Date(user.checkOutTime);
         const checkOutTime = {
           dateObj: dateObj,
-          hour: dateObj.getHours() % 12,
+          hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
           minute: dateObj.getMinutes(),
           meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
         };
@@ -661,7 +682,7 @@ function stringToJSON(data) {
       /**
        * @param {user} user
        */
-       function (user) {
+      function (user) {
         /* Extract values for the checkInTime to an object... */
         let dateObj = new Date(user.checkInTime);
         const checkInTime = {
@@ -694,7 +715,7 @@ function stringToJSON(data) {
   return data;
 }
 
-/* //! ======================== PAGE ERROR HANDLING =========================  */  
+/* //! ======================== PAGE ERROR HANDLING =========================  */
 /**
  * @function setTableRefresh
  * @param {Number} rate refresh rate in seconds
@@ -702,7 +723,6 @@ function stringToJSON(data) {
  */
 function setTableRefresh(rate) {
   const intervalID = setInterval(function () {
-    
     fillAssignedTable(globalUserData["assigned"]);
     fillUnassignedTable(globalUserData["unassigned"]);
   }, rate * 1000);

@@ -48,28 +48,27 @@ function user(
  * @function userGetElapsedTime
  * @param {user} userObj
  * @return elapsedTime object
- * @brief Retrieves the user elapsed time as an object and stores into its 
- * checkInTime property. 
+ * @brief Retrieves the user elapsed time as an object and stores into its
+ * checkInTime property.
  * @precondition The user check in time has already been recorded by calling
  *               userCheckInTime().
  */
 const userGetElapsedTime = function (userObj) {
-  let difference = new Date(new Date() - userObj.checkInTime.dateObj);
-  /* Okay, I have no idea why but by default hours is getting
-     set to 16, even though it should be 0. */
+  let difference = new Date(Math.abs(new Date() - userObj.checkInTime.dateObj));
   const obj = {
     dateObj: difference,
-    hour: difference.getHours() - 16,
+    hour: Math.floor(difference.getTime() / 3600000),  // in milliseconds to hrs
     minute: difference.getMinutes(),
-  }
+    day: Math.floor(difference.getTime() / 86400000), // in milliseconds to days
+  };
   userObj.elapsedTime = obj;
   return obj;
 };
 
 /**
  * @function
- * @param {user} userObj 
- * @brief Initializes the user check in time as an object and stores into its 
+ * @param {user} userObj
+ * @brief Initializes the user check in time as an object and stores into its
  * checkOutTime property.
  */
 const userSetCheckOutTime = function (userObj) {
@@ -77,17 +76,17 @@ const userSetCheckOutTime = function (userObj) {
   const obj = {
     dateObj: d /* In case we need to perform date 
                                    arithmetics, such as getElapsedTime() */,
-    hour: d.getHours() % 12,
-    minute: d.getMinutes(),
-    meridiem: d.getHours() / 12 > 1 ? "PM" : "AM",
+    // hour: d.getHours() % 12 === 0 ? 12 : d.getHours() % 12,
+    // minute: d.getMinutes(),
+    // meridiem: d.getHours() / 12 > 1 ? "PM" : "AM",
   };
   userObj.checkOutTime = obj;
 };
 
 /**
  * @function userSetCheckInTime
- * @param {user} userObj 
- * @brief Initializes the user check in time as an object and stores into its 
+ * @param {user} userObj
+ * @brief Initializes the user check in time as an object and stores into its
  * checkInTime property.
  */
 const userSetCheckInTime = function (userObj) {
@@ -95,12 +94,11 @@ const userSetCheckInTime = function (userObj) {
   const obj = {
     dateObj: d /* In case we need to perform date 
                                    arithmetics, such as getElapsedTime() */,
-    hour: d.getHours() % 12,
-    minute: d.getMinutes(),
-    meridiem: d.getHours() / 12 > 1 ? "PM" : "AM",
+    // hour: (d.getHours() % 12 === 0) ? 12 : d.getHours() % 12,
+    // minute: d.getMinutes(),
+    // meridiem: d.getHours() / 12 > 1 ? "PM" : "AM",
   };
-  console.log("the AM/PM", obj.meridiem);
-
+  
   userObj.checkInTime = obj;
 };
 
