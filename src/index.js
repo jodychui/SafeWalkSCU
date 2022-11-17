@@ -43,7 +43,6 @@ import {
   userSetCheckOutTime,
 } from "./classes.js";
 
-import { user } from "./classes.js";
 import { walker } from "./walker.js";
 
 // import the walker object here!
