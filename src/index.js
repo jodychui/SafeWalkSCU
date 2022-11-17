@@ -35,12 +35,17 @@ import {
   GoogleAuthProvider,
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
 
+
 import {
   user,
   userGetElapsedTime,
   userSetCheckInTime,
   userSetCheckOutTime,
 } from "./classes.js";
+
+import { user } from "./classes.js";
+import { walker } from "./walker.js";
+
 // import the walker object here!
 
 const firebaseConfig = {
@@ -179,33 +184,23 @@ function writeUserData(user) {
 /**
  * @function writeWalkerData
  * @param {user} user
+ * @var assigned shows if user is assigned to a walker
  * @brief Takes user (walker) object and writes to the database in
  * database path `/walkers/<authorizationToken>`.
  * */
-function writeWalkerData(user) {
-  set(ref(db, "walkers/" + walkerToken[2]), {
-    token: user.token,
-    name: user.name,
-    email: user.email,
-    phoneNumber: user.phoneNumber,
-    assigned: user.assigned,
-    pairedWith: user.pairedWith,
-    addresses: {
-      srcAddressL1: user.addresses.srcAddressL1,
-      srcAddressL2: user.addresses.srcAddressL2,
-      dstAddressL1: user.addresses.dstAddressL1,
-      dstAddressL2: user.addresses.dstAddressL2,
-    },
-    checkInTime: {
-      dateObj: user.checkInTime.dateObj.toString(),
-      hour: user.checkInTime.hour,
-      minute: user.checkInTime.minute,
-    },
-    checkOutTime: {
-      dateObj: user.checkOutTime.dateObj.toString(),
-      hour: user.checkInTime.hour,
-      minute: user.checkInTime.minute,
-    },
+
+function writeWalkerData(walker) {
+  const db = getDatabase();//get reference to database
+  set(ref(db, `walkers/${walker.onWalk ? 'unavailable' : 'available'}/` + walkerToken[0]), {
+    token: walker.token,
+    name: walker.name,
+    email: walker.email,
+    phoneNumber: walker.phoneNumber,
+    available: walker.onDuty && !walker.onWalk,//!!check this
+    unavailable: !walker.onDuty || walker.onWalk,
+    pairedWith: walker.pairedWith,
+    currentLocation: walker.currentLocation,
+    completedWalk: walker.completedWalk
   });
 }
 
@@ -251,6 +246,7 @@ async function main() {
   // signIn();
   /* initializeData is async. That means user data will be undefined
      until the data is completely retrieved. */
+
   let fields = {
     userToken: ["a", "b", "c", "d"],
     names: ["Jodi", "Marty", "Kristina", "Shamwow"],
