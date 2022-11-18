@@ -41,7 +41,6 @@ import {
   userGetCheckInTime,
   userSetCheckInTime,
   userSetCheckOutTime,
-  
 } from "./classes.js";
 
 import { walker } from "./walker.js";
@@ -418,13 +417,11 @@ function fillAssignedTable(data) {
     tr.children[1].textContent = user.name;
     tr.children[2].textContent = user.addresses.dstAddressL1 + " ";
     tr.children[3].textContent = "TODO";
-    if (user.elapsedTime.day >= 1){
-      tr.children[4].textContent = `> ${user.elapsedTime.day} days`
-    }
-    else{
+    if (user.elapsedTime.day >= 1) {
+      tr.children[4].textContent = `> ${user.elapsedTime.day} days`;
+    } else {
       tr.children[4].textContent = `${user.elapsedTime.hour} ${
-        
-          user.elapsedTime.hour > 1 ? "hours" : "hour"
+        user.elapsedTime.hour > 1 ? "hours" : "hour"
       } ${user.elapsedTime.minute} ${
         user.elapsedTime.minute > 1 ? "mins" : "min"
       }`;
@@ -657,7 +654,7 @@ function stringToJSON(data) {
           dateObj: dateObj,
           hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
           minute: dateObj.getMinutes(),
-          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
         };
         user.checkInTime = checkInTime;
 
@@ -666,7 +663,7 @@ function stringToJSON(data) {
           dateObj: dateObj,
           hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
           minute: dateObj.getMinutes(),
-          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
         };
         user.checkOutTime = checkOutTime;
 
@@ -692,7 +689,7 @@ function stringToJSON(data) {
           dateObj: dateObj,
           hour: dateObj.getHours() % 12,
           minute: dateObj.getMinutes(),
-          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
         };
         user.checkInTime = checkInTime;
 
@@ -701,7 +698,7 @@ function stringToJSON(data) {
           dateObj: dateObj,
           hour: dateObj.getHours() % 12,
           minute: dateObj.getMinutes(),
-          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
         };
         user.checkOutTime = checkOutTime;
 
