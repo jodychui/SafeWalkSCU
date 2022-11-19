@@ -15,10 +15,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
-    <!-- JavaScript -->
+    <script src="demo.js" async defer></script>
+
     <script src="index.js" type="module" async defer></script>
+    
     <script src="classes.js" async defer></script>
-    <script src="walker.js" async defer></script>
     <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
 
 
@@ -85,10 +86,16 @@
                         <h1>Requests</h1>
 
                         <!-- New Requests table -->
-                        <table class="table new-requests table-responsive table-curved">
+                        <h3>New Requests</h3>
+                        <table class="table new-requests table-responsive" style="
+    display: flex;
+    flex-direction: column;
+">
                             <thead class="thead-light">
-                                <tr>
-                                    <h3>New Requests</h3>
+                                <tr style="
+    display: flex;
+">
+
                                     <th scope="col" style="width: 10%">Time</th>
                                     <th scope="col" style="width: 15%">Requester Name</th>
                                     <th scope="col" style="width: 30%">Current Location</th>
@@ -97,61 +104,158 @@
                                     <th scope="col" style="width: 10%">Delete</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style="
+    display: flex;
+    flex-direction: column;
+">
                                 <!-- Example row -->
-                                <tr>
-                                    <th scope=" row">11:39 PM</th>
-                                    <td>Helen Hywater</td>
-                                    <td>1234 Some Street Name, City</td>
-                                    <td>1234 Some Street Name, City</td>
-                                    <td>
+                                
+                                <!-- End example row -->
+                            <tr style="
+    display: flex;
+    width: 100%;
+" usertoken="a" assigned="false">
+                                    <th scope=" row" style="
+    width: 10%;
+">
+      07:44 AM</th>
+                                    <td style="
+    width: 15%;
+">Jodi</td>
+                                    <td style="width: 30%;">324 Villa Rd </td>
+                                    <td style="
+    width: 30%;
+">423 El Camino Rd </td>
+                                    <td style="
+    width: 10%;
+">
                                         <span class="material-icons">person_add</span>
                                     </td>
-                                    <td>
+                                    <td style="
+    width: 10%;
+">
                                         <span class="material-icons">delete</span>
                                     </td>
-                                </tr>
-                                <!-- End example row -->
-                            </tbody>
+                                </tr><tr style="
+    display: flex;
+    width: 100%;
+" usertoken="b" assigned="false">
+                                    <th scope=" row" style="
+    width: 10%;
+">
+      07:44 AM</th>
+                                    <td style="
+    width: 15%;
+">Marty</td>
+                                    <td style="width: 30%;">322 Country Rd </td>
+                                    <td style="
+    width: 30%;
+">322 DownTown Ave </td>
+                                    <td style="
+    width: 10%;
+">
+                                        <span class="material-icons">person_add</span>
+                                    </td>
+                                    <td style="
+    width: 10%;
+">
+                                        <span class="material-icons">delete</span>
+                                    </td>
+                                </tr><tr style="
+    display: flex;
+    width: 100%;
+" usertoken="c" assigned="false">
+                                    <th scope=" row" style="
+    width: 10%;
+">
+      07:44 AM</th>
+                                    <td style="
+    width: 15%;
+">Kristina</td>
+                                    <td style="width: 30%;">523 New York Ave </td>
+                                    <td style="
+    width: 30%;
+">234 Vickie Ave </td>
+                                    <td style="
+    width: 10%;
+">
+                                        <span class="material-icons">person_add</span>
+                                    </td>
+                                    <td style="
+    width: 10%;
+">
+                                        <span class="material-icons">delete</span>
+                                    </td>
+                                </tr></tbody>
                         </table>
                         <!-- End of New Requests table -->
 
 
                         <!-- Current Requests table -->
-                        <table class="table new-requests table-responsive">
-                            <thead class="thead-light">
-                                <tr>
-                                    <h3>Current Requests</h3>
+                        <h3>Current Requests</h3>
+                        <table class="table new-requests table-responsive" style="
+    display: flex;
+    flex-direction: column;
+">
+                            <thead class="thead-light" style="
+    display: block;
+">
+                                <tr style="
+    display: flex;
+    justify-content: space-between;
+">
+
                                     <th scope="col" style="width: 10%">Time</th>
                                     <th scope="col" style="width: 15%">Requester Name</th>
                                     <th scope="col" style="width: 30%">Destination</th>
-                                    <th scope="col" style="width: 10%">Walkers</th>
+                                    <th scope="col" style="width: 15%;">Walkers</th>
                                     <th scope="col" style="width: 15%">Time Elapsed</th>
                                     <th scope="col" style="width: 10%">Chat</th>
                                     <th scope="col" style="width: 10%">Delete</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style="
+    display: flex;
+    flex-direction: column;
+">
                                 <!-- Example row -->
-                                <tr>
-                                    <th scope=" row">11:39 PM</th>
-                                    <td>Helen Hywater</td>
-                                    <td>1234 Some Street Name, City</td>
-                                    <td></td>
-                                    <td>1:10:02</td>
-                                    <td>
+                                
+                                <!-- End example row -->
+                            <tr style="
+    display: flex;
+    justify-content: space-between;
+" usertoken="d" assigned="true">
+                                    <th scope=" row" style="
+    width: 10%;
+">
+    07:44 AM</th>
+                                    <td style="
+    width: 15%;
+">Shamwow</td>
+                                    <td style="
+    width: 30%;
+">234 Dope Blvd </td>
+                                    <td style="
+    width: 15%;
+"> &amp; </td>
+                                    <td style="
+    width: 15%;
+">7 hours 13 mins</td>
+                                    <td style="
+    width: 10%;
+">
                                         <span class="material-icons">chat</span>
                                     </td>
-                                    <td>
+                                    <td style="
+    width: 10%;
+">
                                         <span class="material-icons">delete</span>
                                     </td>
-                                </tr>
-                                <!-- End example row -->
-                            </tbody>
+                                </tr></tbody>
                         </table>
                         <!-- End of Current Requests table -->
 
-                    </div>
+                    <p id="last-refreshed" style="text-align: center; font-size: smaller">Data last updated: Wed Nov 16 2022 14:57:24 GMT-0800 (Pacific Standard Time)</p></div>
                 </main>
                 <footer class="row py-4 mt-auto">
 

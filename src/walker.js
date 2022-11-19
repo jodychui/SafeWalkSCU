@@ -33,6 +33,7 @@ function walker( //function that returns an object
         userToken: '',
       }
       //this.photo = photo,
+      this.checkInTime = new Date();
       this.currentLocation = currentLocation;
       this.completedWalk = completedWalk;
     }

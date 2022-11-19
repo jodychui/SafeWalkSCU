@@ -104,17 +104,17 @@ function initializeData() {
      *  The get() is a firebase function which takes in two params.
      *  1. the databaseReference
      *  2. the path where the database is located. The child() will
-     *     give us the subpath of /users/<this>.
+     *     give us the subpath of /<this>.
      */
-    return get(child(dbRef, "users/"))
+    return get(dbRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
           let obj = {};
-          if (snapshot.hasChild("assigned")) {
-            obj["assigned"] = snapshot.child("assigned").val();
+          if (snapshot.hasChild("assignedUsers")) {
+            obj["assignedUsers"] = snapshot.child("assignedUsers").val();
           }
-          if (snapshot.hasChild("unassigned")) {
-            obj["unassigned"] = snapshot.child("unassigned").val();
+          if (snapshot.hasChild("unassignedUsers")) {
+            obj["unassignedUsers"] = snapshot.child("unassignedUsers").val();
           }
           /* Promise is resolved here.  */
           resolve(obj);
@@ -137,8 +137,8 @@ function initializeData() {
     globalUserData = data;
     stringToJSON(globalUserData);
 
-    fillUnassignedTable(globalUserData["unassigned"]);
-    fillAssignedTable(globalUserData["assigned"]);
+    fillUnassignedTable(globalUserData["unassignedUsers"]);
+    fillAssignedTable(globalUserData["assignedUsers"]);
 
     showLastRefreshed();
     return data;
@@ -149,14 +149,14 @@ function initializeData() {
  * @function writeUserData
  * @param {user} user
  * @brief Takes user (walkee) object and writes to the database in
- * database path `/users/<authorizationToken>`.
+ * database path `/<authorizationToken>`.
  * */
 function writeUserData(user) {
   /* Whenever we're writing we need to get the reference to the 
      database, and we can do so initializing it with a getDatabase() method.
   */
   set(
-    ref(db, `users/${user.assigned ? "assigned" : "unassigned"}/` + user.token),
+    ref(db, `${user.assigned ? "assignedUsers" : "unassignedUsers"}/` + user.token),
     {
       token: user.token,
       name: user.name,
@@ -182,18 +182,17 @@ function writeUserData(user) {
 
 /**
  * @function writeWalkerData
- * @param {user} user
+ * @param {walker} walker
  * @var assigned shows if user is assigned to a walker
  * @brief Takes user (walker) object and writes to the database in
  * database path `/walkers/<authorizationToken>`.
  * */
-
 function writeWalkerData(walker) {
   const db = getDatabase(); //get reference to database
   set(
     ref(
       db,
-      `walkers/${walker.onWalk ? "unavailable" : "available"}/` + walkerToken[0]
+      `${walker.onWalk ? "unavailableWalkers" : "availableWalkers"}/` + walkerToken[0]
     ),
     {
       token: walker.token,
@@ -201,7 +200,9 @@ function writeWalkerData(walker) {
       email: walker.email,
       phoneNumber: walker.phoneNumber,
       available: walker.onDuty && !walker.onWalk, //!!check this
-      unavailable: !walker.onDuty || walker.onWalk,
+      // unavailable: !walker.onDuty || walker.onWalk,
+      checkInTime: walker.checkInTime,
+
       pairedWith: walker.pairedWith,
       currentLocation: walker.currentLocation,
       completedWalk: walker.completedWalk,
@@ -282,7 +283,7 @@ async function main() {
     assigned: [false, false, false, true],
   };
   let arr = [];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 4; i++) {
     let user1 = new user(
       fields.userToken[i],
       fields.names[i],
@@ -296,20 +297,14 @@ async function main() {
     userSetCheckInTime(user1);
 
     arr.push(user1);
-    // writeUserData(user1);
+    writeUserData(user1);
   }
-  const user1 = new user(
-    "f",
-    "shamwow",
-    "shamwow@ucsd.edu",
-    "341-321-1231",
-    "Shammy ave",
-    "",
-    "el camino rd"
-  );
-  user1.assigned = true;
-  // userSetCheckInTime(user1);
-  // writeUserData(user1);
+  // const walker1 = new walker('g','John', 'walker@scu.edu','714-324-3212', true, false, 'El Perrito Blvd' , false
+  // );
+  // walker1.assigned = true;
+  // userSetCheckInTime(walker1);
+  // writeWalkerData(walker1);
+   
 
   initializeData();
   setTableRefresh(1);
@@ -357,7 +352,7 @@ function fillUnassignedTable(data) {
   for (const tr of tbody.children) {
     const user = Object.values(data)[i++];
     tr.setAttribute("userToken", user.token);
-    tr.setAttribute("assigned", "false");
+    tr.setAttribute("assignedUsers", "false");
     tr.children[0].textContent = `
       ${trailingZeroes(user.checkInTime.hour, 2)}:${trailingZeroes(
       user.checkInTime.minute,
@@ -408,7 +403,7 @@ function fillAssignedTable(data) {
     userGetElapsedTime(user);
     userGetCheckInTime(user);
     tr.setAttribute("userToken", user.token);
-    tr.setAttribute("assigned", true);
+    tr.setAttribute("assignedUsers", true);
     tr.children[0].textContent = `
     ${trailingZeroes(user.checkInTime.hour, 2)}:${trailingZeroes(
       user.checkInTime.minute,
@@ -446,12 +441,12 @@ function fillAssignedTable(data) {
 async function deleteUserOnClick(e) {
   console.log(`you clicked ${e.currentTarget}!!`);
   const userToken = e.currentTarget.parentNode.getAttribute("userToken");
-  const assigned = e.currentTarget.parentNode.getAttribute("assigned");
+  const assigned = e.currentTarget.parentNode.getAttribute("assignedUsers");
 
   /* 1. Create a reference to the db with the given userToken. and get its 
         directory. */
-  const path = `users/${
-    assigned === "true" ? "assigned" : "unassigned"
+  const path = `${
+    assigned === "true" ? "assignedUsers" : "unassignedUsers"
   }/${userToken}`;
   console.log(path);
   const target = ref(db, path);
@@ -471,8 +466,8 @@ async function deleteUserOnClick(e) {
  *        Alternative to using AddEventListener 'click' event.
  */
 async function deleteUserByToken(userToken, assigned, deleted = true) {
-  const path = `users/${
-    assigned === "true" ? "assigned" : "unassigned"
+  const path = `${
+    assigned === "true" ? "assignedUsers" : "unassignedUsers"
   }/${userToken}`;
   console.log(path);
   remove(ref(db, path));
@@ -574,7 +569,7 @@ function showLastRefreshed() {
  * Takes a userToken to move the corresponding row into the assigned table.
  */
 function moveToAssigned(userToken) {
-  let newAssignedUser = globalUserData["unassigned"][userToken];
+  let newAssignedUser = globalUserData["unassignedUsers"][userToken];
   if (typeof newAssignedUser === "undefined") {
     return;
   }
@@ -642,8 +637,8 @@ function cloneEmptyElements() {
  *              'unassigned.'
  */
 function stringToJSON(data) {
-  if (typeof data["unassigned"] !== "undefined") {
-    Object.values(data["unassigned"]).forEach(
+  if (typeof data["unassignedUsers"] !== "undefined") {
+    Object.values(data["unassignedUsers"]).forEach(
       /**
        * @param {user} user
        */
@@ -677,8 +672,8 @@ function stringToJSON(data) {
       }
     );
   }
-  if (typeof data["assigned"] !== "undefined") {
-    Object.values(data["assigned"]).forEach(
+  if (typeof data["assignedUsers"] !== "undefined") {
+    Object.values(data["assignedUsers"]).forEach(
       /**
        * @param {user} user
        */
@@ -723,7 +718,7 @@ function stringToJSON(data) {
  */
 function setTableRefresh(rate) {
   const intervalID = setInterval(function () {
-    fillAssignedTable(globalUserData["assigned"]);
-    fillUnassignedTable(globalUserData["unassigned"]);
+    fillAssignedTable(globalUserData["assignedUsers"]);
+    fillUnassignedTable(globalUserData["unassignedUsers"]);
   }, rate * 1000);
 }
