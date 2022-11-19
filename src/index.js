@@ -160,8 +160,7 @@ function writeUserData(user) {
     },
   });
 }
-
-/**
+ /**
  * @function writeWalkerData
  * @param {user} user
  * @var assigned shows if user is assigned to a walker
@@ -170,13 +169,13 @@ function writeUserData(user) {
  * */
 function writeWalkerData(walker) {
   const db = getDatabase();//get reference to database
-  set(ref(db, `walkers/${walker.onWalk ? 'unavailable' : 'available'}/` + walkerToken[0]), {
+  set(ref(db, `walkers/${walker.isAvailable ? 'available' : 'unavailable'}/` + walkerToken[0]), {
     token: walker.token,
     name: walker.name,
     email: walker.email,
     phoneNumber: walker.phoneNumber,
-    available: walker.onDuty && !walker.onWalk,//!!check this
-    unavailable: !walker.onDuty || walker.onWalk,
+    available: walker.onDuty && walker.isAvailable,
+    unavailable: !walker.onDuty || !walker.isAvailable,
     pairedWith: walker.pairedWith,
     currentLocation: walker.currentLocation,
     completedWalk: walker.completedWalk
@@ -231,9 +230,12 @@ async function main() {
   //example: create user object 
   const user1 = new user(userToken[0],'james','xxx@scu.edu','6263333333', 't', 't', 't', 't');
   console.log('the user: ', user1);
-  const walker1 = new walker(userToken[0],'sam','xxxxx@scu.edu','6501112222',true,true,'500 El Camino Real, Santa Clara, CA, 94065', false);
+  const walker1 = new walker(userToken[0],'jodi','xxxxx@scu.edu','6501112222',true,true,'500 El Camino Real, Santa Clara, CA, 94065', false);
   console.log('the walker: ', walker1);
   //writeWalkerData(walker1);// COMMENT AFTER RUNNING TO SAVE QUOTA!!!!!
+  const walker2 = new walker(userToken[0],'billy','xxxxxxx@scu.edu','4159990000',true,false,'500 El Camino Real, Santa Clara, CA, 94065', false);
+  console.log('the walker: ', walker2);
+  //writeWalkerData(walker2)
   
   // user1.assigned = true;
   // console.log(user1);

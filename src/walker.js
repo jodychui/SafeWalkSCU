@@ -1,12 +1,12 @@
 /**
  * @function walker
- * @param {*} token 
- * @param {*} name 
- * @param {*} onDuty 
- * @param {*} onWalk 
- * @param {*} email 
- * @param {*} currentLocation 
- * @param {*} completedWalk 
+ * @param {String} token 
+ * @param {String} name 
+ * @param {Boolean} onDuty 
+ * @param {Boolean} isAvailable 
+ * @param {String} email 
+ * @param {String} currentLocation 
+ * @param {Boolean} completedWalk 
  * @brief this walker object allows developers to create 
  *        multiple instances of a walker with these traits
  */
@@ -17,7 +17,7 @@ function walker( //function that returns an object
     email,
     phoneNumber,
     onDuty, 
-    onWalk, 
+    isAvailable, 
     //photo, 
     currentLocation,
     completedWalk
@@ -27,7 +27,7 @@ function walker( //function that returns an object
       this.email = email;
       this.phoneNumber = phoneNumber;
       this.onDuty = onDuty;
-      this.onWalk = onWalk;
+      this.isAvailable = isAvailable;
       this.pairedWith = ''//not in parameter
       //this.photo = photo,
       this.currentLocation = currentLocation;
