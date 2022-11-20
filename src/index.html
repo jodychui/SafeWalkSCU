@@ -102,104 +102,55 @@
                                     <th scope="col" style="width: 30%">Destination</th>
                                     <th scope="col" style="width: 10%">Assign</th>
                                     <th scope="col" style="width: 10%">Delete</th>
-                                </tr>
-                            </thead>
-                            <tbody style="
-    display: flex;
-    flex-direction: column;
-">
-                                <!-- Example row -->
-                                
-                                <!-- End example row -->
-                            <tr style="
-    display: flex;
-    width: 100%;
-" usertoken="a" assigned="false">
-                                    <th scope=" row" style="
-    width: 10%;
-">
-      07:44 AM</th>
-                                    <td style="
-    width: 15%;
-">Jodi</td>
-                                    <td style="width: 30%;">324 Villa Rd </td>
-                                    <td style="
-    width: 30%;
-">423 El Camino Rd </td>
-                                    <td style="
-    width: 10%;
-">
-                                        <span class="material-icons">person_add</span>
-                                    </td>
-                                    <td style="
-    width: 10%;
-">
-                                        <span class="material-icons">delete</span>
-                                    </td>
-                                </tr><tr style="
-    display: flex;
-    width: 100%;
-" usertoken="b" assigned="false">
-                                    <th scope=" row" style="
-    width: 10%;
-">
-      07:44 AM</th>
-                                    <td style="
-    width: 15%;
-">Marty</td>
-                                    <td style="width: 30%;">322 Country Rd </td>
-                                    <td style="
-    width: 30%;
-">322 DownTown Ave </td>
-                                    <td style="
-    width: 10%;
-">
-                                        <span class="material-icons">person_add</span>
-                                    </td>
-                                    <td style="
-    width: 10%;
-">
-                                        <span class="material-icons">delete</span>
-                                    </td>
-                                </tr><tr style="
-    display: flex;
-    width: 100%;
-" usertoken="c" assigned="false">
-                                    <th scope=" row" style="
-    width: 10%;
-">
-      07:44 AM</th>
-                                    <td style="
-    width: 15%;
-">Kristina</td>
-                                    <td style="width: 30%;">523 New York Ave </td>
-                                    <td style="
-    width: 30%;
-">234 Vickie Ave </td>
-                                    <td style="
-    width: 10%;
-">
-                                        <span class="material-icons">person_add</span>
-                                    </td>
-                                    <td style="
-    width: 10%;
-">
-                                        <span class="material-icons">delete</span>
-                                    </td>
-                                </tr></tbody>
-                        </table>
-                        <!-- End of New Requests table -->
-
-
-                        <!-- Current Requests table -->
-                        <h3>Current Requests</h3>
-                        <table class="table new-requests table-responsive" style="
-    display: flex;
-    flex-direction: column;
-">
-                            <thead class="thead-light" style="
-    display: block;
-">
+                                    </tr>
+                                    </thead>
+                                    <tbody style="
+                                        display: flex;
+                                        flex-direction: column;
+                                    " id="unassignedTable">
+                                        <!-- Example row -->
+                                    
+                                        <!-- End example row -->
+                                        <tr style="
+                                        display: flex;
+                                        width: 100%;
+                                    " usertoken="a" assigned="false">
+                                            <th scope=" row" style="
+                                        width: 10%;
+                                    "></th>
+                                            <td style="
+                                        width: 15%;
+                                    "></td>
+                                            <td style="width: 30%;"></td>
+                                            <td style="
+                                        width: 30%;
+                                    "></td>
+                                            <td style="
+                                        width: 10%;
+                                    ">
+                                                <span class="material-icons">person_add</span>
+                                            </td>
+                                            <td style="
+                                        width: 10%;
+                                    ">
+                                                <span class="material-icons">delete</span>
+                                            </td>
+                                        </tr>
+                                    
+                                    </tbody>
+                                    </table>
+                                    <!-- End of New Requests table -->
+                                    
+                                    
+                                    <!-- Current Requests table -->
+                                    <h3>Current Requests</h3>
+                                    <table class="table new-requests table-responsive" style="
+                                        display: flex;
+                                        flex-direction: column;
+                                    ">
+                                        <thead class="thead-light" style="
+                                        display: block;
+                                    ">
                                 <tr style="
     display: flex;
     justify-content: space-between;
@@ -217,7 +168,7 @@
                             <tbody style="
     display: flex;
     flex-direction: column;
-">
+" id="assignedTable">
                                 <!-- Example row -->
                                 
                                 <!-- End example row -->
@@ -227,20 +178,19 @@
 " usertoken="d" assigned="true">
                                     <th scope=" row" style="
     width: 10%;
-">
-    07:44 AM</th>
+"></th>
                                     <td style="
     width: 15%;
-">Shamwow</td>
+"></td>
                                     <td style="
     width: 30%;
-">234 Dope Blvd </td>
+"></td>
                                     <td style="
     width: 15%;
 "> &amp; </td>
                                     <td style="
     width: 15%;
-">7 hours 13 mins</td>
+"></td>
                                     <td style="
     width: 10%;
 ">
@@ -254,8 +204,7 @@
                                 </tr></tbody>
                         </table>
                         <!-- End of Current Requests table -->
-
-                    <p id="last-refreshed" style="text-align: center; font-size: smaller">Data last updated: Wed Nov 16 2022 14:57:24 GMT-0800 (Pacific Standard Time)</p></div>
+</div>
                 </main>
                 <footer class="row py-4 mt-auto">
 
