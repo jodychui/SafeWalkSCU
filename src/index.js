@@ -42,9 +42,7 @@ import {
   userSetCheckInTime,
   userSetCheckOutTime,
 } from "./classes.js";
-
 import { walker } from "./walker.js";
-
 // import the walker object here!
 
 const firebaseConfig = {
@@ -116,6 +114,13 @@ function initializeData() {
           if (snapshot.hasChild("unassignedUsers")) {
             obj["unassignedUsers"] = snapshot.child("unassignedUsers").val();
           }
+          if (snapshot.hasChild('unavailableWalkers')){
+            obj['unavailableWalkers'] = snapshot.child('unavailableWalkers').val();
+          }
+          if (snapshot.hasChild('availableWalkers')){
+            obj['availableWalkers'] = snapshot.child('availableWalkers').val();
+          }
+
           /* Promise is resolved here.  */
           resolve(obj);
         } else {
@@ -136,7 +141,8 @@ function initializeData() {
     /* First and foremost we convert necessary properties to objects. */
     globalUserData = data;
     stringToJSON(globalUserData);
-
+    organizePair(globalUserData);
+    console.log(globalUserData)
     fillUnassignedTable(globalUserData["unassignedUsers"]);
     fillAssignedTable(globalUserData["assignedUsers"]);
 
@@ -188,26 +194,22 @@ function writeUserData(user) {
  * database path `/walkers/<authorizationToken>`.
  * */
 function writeWalkerData(walker) {
-  const db = getDatabase(); //get reference to database
-  set(
-    ref(
-      db,
-      `${walker.onWalk ? "unavailableWalkers" : "availableWalkers"}/` + walkerToken[0]
-    ),
-    {
-      token: walker.token,
-      name: walker.name,
-      email: walker.email,
-      phoneNumber: walker.phoneNumber,
-      available: walker.onDuty && !walker.onWalk, //!!check this
-      // unavailable: !walker.onDuty || walker.onWalk,
-      checkInTime: walker.checkInTime,
+  const path =
+    walker.onDuty && !walker.onWalk ? "availableWalkers" : "unavailableWalkers";
+  set(ref(db, `${path}/` + walkerToken[0]), {
+    token: walker.token,
+    name: walker.name,
+    email: walker.email,
+    phoneNumber: walker.phoneNumber,
+    available: walker.onDuty && !walker.onWalk, //!!check this
+    // unavailable: !walker.onDuty || walker.onWalk,
+    checkInTime: walker.checkInTime.dateObj.toString(),
+    checkOutTime: walker.checkOutTime.dateObj.toString(),
 
-      pairedWith: walker.pairedWith,
-      currentLocation: walker.currentLocation,
-      completedWalk: walker.completedWalk,
-    }
-  );
+    pairedWith: walker.pairedWith,
+    currentLocation: walker.currentLocation,
+    completedWalk: walker.completedWalk,
+  });
 }
 
 /**
@@ -282,31 +284,31 @@ async function main() {
     ],
     assigned: [false, false, false, true],
   };
-  let arr = [];
-  for (let i = 0; i < 4; i++) {
-    let user1 = new user(
-      fields.userToken[i],
-      fields.names[i],
-      fields.emails[i],
-      fields.phoneNumbers[i],
-      fields.srcAddressL1[i],
-      "",
-      fields.dstAddressL1[i]
-    );
-    user1.assigned = fields.assigned[i];
-    userSetCheckInTime(user1);
+  // let arr = [];
+  // for (let i = 0; i < 1; i++) {
+  //   let user1 = new user(
+  //     fields.userToken[i],
+  //     fields.names[i],
+  //     fields.emails[i],
+  //     fields.phoneNumbers[i],
+  //     fields.srcAddressL1[i],
+  //     "",
+  //     fields.dstAddressL1[i]
+  //   );
+  //   user1.assigned = fields.assigned[i];
+  //   userSetCheckInTime(user1);
 
-    arr.push(user1);
-    writeUserData(user1);
-  }
-  // const walker1 = new walker('g','John', 'walker@scu.edu','714-324-3212', true, false, 'El Perrito Blvd' , false
-  // );
-  // walker1.assigned = true;
-  // userSetCheckInTime(walker1);
-  // writeWalkerData(walker1);
+  //   arr.push(user1);
+  //   writeUserData(user1);
+  // }
+  const walker1 = new walker('z','Xavier', 'Xav@scu.edu','714-324-3212', true, false, 'El Macho Blvd' , false
+  );
+  walker1.assigned = false;
+  userSetCheckInTime(walker1);
+  writeWalkerData(walker1);
    
 
-  initializeData();
+  // initializeData();
   setTableRefresh(1);
 }
 
@@ -321,7 +323,7 @@ main();
  * */
 function fillUnassignedTable(data) {
   /* 1. First, create a table row and create a reference to the tbody.*/
-  const tbody = document.querySelectorAll(".new-requests>tbody")[0];
+  const tbody = document.querySelector("#unassignedTable");
   const tr = tbody.children[0];
   if (typeof data === "undefined") {
     clearUnassignedTable();
@@ -378,7 +380,7 @@ function fillUnassignedTable(data) {
  *               the time and geolocation.
  * */
 function fillAssignedTable(data) {
-  const tbody = document.querySelectorAll(".new-requests>tbody")[1];
+  const tbody = document.querySelector("#assignedTable");
   const tr = tbody.children[0];
   if (typeof data === "undefined") {
     clearAssignedTable();
@@ -482,7 +484,7 @@ async function deleteUserByToken(userToken, assigned, deleted = true) {
  *        'No new requests'
  */
 function clearUnassignedTable() {
-  const tbody = document.querySelectorAll(".new-requests>tbody")[0];
+  const tbody = document.querySelector("#unassignedTable");
   const tr = tbody.children[0];
   if (typeof tr === "undefined") return;
   if (tr.children.length > 0) {
@@ -505,7 +507,7 @@ function clearUnassignedTable() {
  *        'No new requests'
  */
 function clearAssignedTable() {
-  const tbody = document.querySelectorAll(".new-requests>tbody")[1];
+  const tbody = document.querySelector("#assignedTable");
   const tr = tbody.children[0];
   if (typeof tr === "undefined") return;
   if (tr.children.length > 0) {
@@ -609,7 +611,7 @@ function trailingZeroes(number, howMany) {
 function cloneEmptyElements() {
   /* For Unassigned Table Row */
   let arr = [];
-  let row1 = document.querySelector("tbody").children[0];
+  let row1 = document.querySelector("#unassignedTable").children[0];
   let newRow1 = row1.cloneNode(true);
   for (let i = 0; i < 4; i++) {
     newRow1.children[i].textContent = "";
@@ -617,7 +619,7 @@ function cloneEmptyElements() {
   arr["unassignedRow"] = newRow1;
 
   /* For assigned Table Row */
-  let row2 = document.querySelectorAll("tbody")[1].children[0];
+  let row2 = document.querySelector('#assignedTable').children[0];
   let newRow2 = row2.cloneNode(true);
   for (let i = 0; i < 5; i++) {
     newRow2.children[i].textContent = "";
@@ -707,7 +709,105 @@ function stringToJSON(data) {
       }
     );
   }
+  if (typeof data["availableWalkers"] !== "undefined") {
+    Object.values(data["availableWalkers"]).forEach(
+      /**
+       * @param {walker} walker
+       */
+      function (walker) {
+        /* Extract values for the checkInTime to an object... */
+        let dateObj = new Date(walker.checkInTime);
+        const checkInTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
+        };
+        walker.checkInTime = checkInTime;
+
+        dateObj = new Date(walker.checkOutTime);
+        const checkOutTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
+        };
+        walker.checkOutTime = checkOutTime;
+      }
+    );
+  }
+  if (typeof data["unavailableWalkers"] !== "undefined") {
+    Object.values(data["unavailableWalkers"]).forEach(
+      /**
+       * @param {walker} walker
+       */
+      function (walker) {
+        /* Extract values for the checkInTime to an object... */
+        let dateObj = new Date(walker.checkInTime);
+        const checkInTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
+        };
+        walker.checkInTime = checkInTime;
+
+        dateObj = new Date(walker.checkOutTime);
+        const checkOutTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
+        };
+        walker.checkOutTime = checkOutTime;
+      }
+    );
+  }
   return data;
+}
+
+/**
+ * @function organizePair
+ * @param {Object} globalUserObj 
+ * @brief  Parses the information in FirebaseDB to create a pair, under 
+ *         `globalUserData['pairs']`, using the user token as the key, and 
+ *         the three user/walkers object as values. 
+ * @precondition There must be even number of available or unavailable walkers
+ *         and its properties have been fully converted to JS objects.
+ */
+function organizePair(globalUserObj){
+    if (typeof globalUserObj['unavailableWalkers'] !== 'undefined'){
+      /* You must first create an object in pairs before you create an array
+         per pair */
+      let newPairLocation =  globalUserObj['pairs'] = {};
+
+      /* Then we can create an array for every assigned users. */
+      Object.keys(globalUserObj['assignedUsers']).forEach(function (userToken){
+        newPairLocation[userToken] = [];
+      } );
+      Object.values(globalUserObj.unavailableWalkers).forEach(
+        /**
+         * @param {walker} walker
+         */
+        function (walker) {
+          /* 1. Get the user token */
+          const sharedToken = walker.pairedWith.userToken;
+          /* 2. Get the user object */
+          const pairedUser = globalUserObj['assignedUsers'][sharedToken];
+
+          /*  This *should* store the user information and the walkers together
+              Recall that two walkers share the same userID, so we gotta filter 
+              that out. */
+          if (!newPairLocation[sharedToken].includes(pairedUser)){
+            newPairLocation[sharedToken].push(pairedUser);
+          }
+          newPairLocation[sharedToken].push(walker);
+        }
+      );
+    }
+    
+    // console.log(globalUserObj);
+    // If there are available walkers, do nothing.
 }
 
 /* //! ======================== PAGE ERROR HANDLING =========================  */
