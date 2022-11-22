@@ -79,6 +79,7 @@
                     </ul>
                 </div>
             </div>
+
             <div class="col d-flex flex-column h-sm-100">
                 <main class="row overflow-auto">
                     <div class="col pt-4">
@@ -87,71 +88,124 @@
                         <!-- New Requests table -->
                         <h3>New Requests</h3>
                         <div class="d-flex flex-column">
-                        <table class="table new-requests table-responsive table-hover ">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th scope="col" style="width: 10%">Time</th>
-                                    <th scope="col" style="width: 20%">Requester Name</th>
-                                    <th scope="col" style="width: 30%">Current Location</th>
-                                    <th scope="col" style="width: 30%">Destination</th>
-                                    <th scope="col" style="width: 5%">Assign</th>
-                                    <th scope="col" style="width: 5%">Delete</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Example row -->
-                                <tr>
-                                    <th scope=" row">11:39 PM</th>
-                                    <td>Helen Hywater</td>
-                                    <td>1234 Some Street Name, City</td>
-                                    <td>1234 Some Street Name, City</td>
-                                    <td>
-                                        <span class="material-icons">person_add</span>
-                                    </td>
-                                    <td>
-                                        <span class="material-icons">delete</span>
-                                    </td>
-                                </tr>
-                                <!-- End example row -->
-                            </tbody>
-                        </table>
+                            <table class="table new-requests table-responsive table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col" style="width: 10%">Time</th>
+                                        <th scope="col" style="width: 20%">Requester Name</th>
+                                        <th scope="col" style="width: 30%">Current Location</th>
+                                        <th scope="col" style="width: 30%">Destination</th>
+                                        <th scope="col" style="width: 5%">Assign</th>
+                                        <th scope="col" style="width: 5%">Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Example row -->
+                                    <tr>
+                                        <th scope="row">11:39 PM</th>
+                                        <td>Helen Hywater</td>
+                                        <td>1234 Some Street Name, City</td>
+                                        <td>1234 Some Street Name, City</td>
+                                        <td class="add-walker">
+                                            <span class="material-icons" data-toggle="modal"
+                                                data-target="#walkersPopUp">person_add</span>
+                                        </td>
+                                        <td class="delete">
+                                            <span class="material-icons">delete</span>
+                                        </td>
+                                    </tr>
+                                    <!-- End example row -->
+                                </tbody>
+                            </table>
                         </div>
                         <!-- End of New Requests table -->
 
+                        <!-- Walkers PopUp -->
+                        <div class="modal fade" id="walkersPopUp" tabindex="-1" role="dialog"
+                            aria-labelledby="walkersPopUpLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="walkersPopUpLabel">Assign to Groups</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table class="table new-requests table-responsive">
+                                            <h6>Unassigned groups</h4>
+                                                <!-- Example row -->
+                                                <tr>
+                                                    <td style="width:10%">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" value=""
+                                                                id="flexCheckDefault" />
+                                                        </div>
+                                                    </td>
+                                                    <td class="walkers-profiles" style="max-width: 45%">
+                                                        <img class="rounded-circle profile-pic-small" alt="avatar"
+                                                            src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80" />
+                                                        <img class="rounded-circle profile-pic-small" alt="avatar"
+                                                            src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80" />
+                                                    </td>
+                                                    <td style="width: 45%">
+                                                        Name #1
+                                                        <br>
+                                                        Name #2
+                                                    </td>
+                                                </tr>
+                                                <!-- End of example row -->
+
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-danger">Assign</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End of Walkers PopUp -->
 
                         <!-- Current Requests table -->
                         <h3>Current Requests</h3>
                         <div class="d-flex flex-column">
-                        <table class="table new-requests table-responsive table-hover">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th scope="col" style="width: 10%">Time</th>
-                                    <th scope="col" style="width: 20%">Requester Name</th>
-                                    <th scope="col" style="width: 30%">Destination</th>
-                                    <th scope="col" style="width: 15%">Walkers</th>
-                                    <th scope="col" style="width: 15%">Time Elapsed</th>
-                                    <th scope="col" style="width: 5%">Chat</th>
-                                    <th scope="col" style="width: 5%">Delete</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Example row -->
-                                <tr>
-                                    <th scope="row">11:39 PM</th>
-                                    <td>Helen Hywater</td>
-                                    <td>1234 Some Street Name, City</td>
-                                    <td></td>
-                                    <td>1:10:02</td>
-                                    <td>
-                                        <span class="material-icons">chat</span>
-                                    </td>
-                                    <td>
-                                        <span class="material-icons">delete</span>
-                                    </td>
-                                </tr>
-                                <!-- End example row -->
-                            </tbody>
-                        </table>
+                            <table class="table new-requests table-responsive table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col" style="width: 10%">Time</th>
+                                        <th scope="col" style="width: 20%">Requester Name</th>
+                                        <th scope="col" style="width: 30%">Destination</th>
+                                        <th scope="col" style="width: 15%">Walkers</th>
+                                        <th scope="col" style="width: 15%">Time Elapsed</th>
+                                        <th scope="col" style="width: 5%">Chat</th>
+                                        <th scope="col" style="width: 5%">Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Example row -->
+                                    <tr>
+                                        <th scope="row">11:39 PM</th>
+                                        <td>Helen Hywater</td>
+                                        <td>1234 Some Street Name, City</td>
+                                        <td class="walkers-profiles">
+                                            <img class="rounded-circle profile-pic-small" alt="avatar"
+                                                src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80" />
+                                            <img class="rounded-circle profile-pic-small" alt="avatar"
+                                                src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80" />
+                                        </td>
+                                        <td>1:10:02</td>
+                                        <td class="chat">
+                                            <span class="material-icons">chat</span>
+                                        </td>
+                                        <td class="delete">
+                                            <span class="material-icons">delete</span>
+                                        </td>
+                                    </tr>
+                                    <!-- End example row -->
+                                </tbody>
+                            </table>
                         </div>
                         <!-- End of Current Requests table -->
 
