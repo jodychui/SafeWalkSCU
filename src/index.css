@@ -3,10 +3,8 @@
     font-family: 'Inter';
 }
 
-@media screen and (min-width: 48em) {
-    .logo img {
-        max-width: 100%;
-    }
+.logo img {
+    max-width: 100%;
 }
 
 body {
@@ -22,4 +20,8 @@ body {
 
 tbody {
     background-color: white;
+}
+
+.profile-pic-small {
+    max-width: 25%;
 }
