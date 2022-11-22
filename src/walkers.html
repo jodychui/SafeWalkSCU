@@ -83,31 +83,106 @@
                     <div class="col pt-4">
                         <h1>Requests</h1>
 
-
+                        
+                        <!-- New Walker Modal -->
+                        <div class="modal fade" id="newWalkerForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Add New Walker</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="form-row">
+                                          <div class="form-group col-md-6">
+                                            <label for="inputFirstName">First Name</label>
+                                            <input type="text" class="form-control" id="inputName" placeholder="First Name">
+                                          </div>
+                                          <div class="form-group col-md-6">
+                                            <label for="inputLastName">Last Name</label>
+                                            <input type="text" class="form-control" id="inputLastName" placeholder="Last Name">
+                                          </div>
+                                        </div>
+                                        <div class="form-group">
+                                          <label for="inputStudentID">Student ID #</label>
+                                          <input type="text" class="form-control" id="inputStudentID" placeholder="1234567">
+                                        </div>
+                                        <div class="form-group">
+                                          <label for="inputEmail">SCU Email</label>
+                                          <input type="text" class="form-control" id="inputEmail" placeholder="email@scu.edu">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="inputSchedule">Schedule: </label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="Wednesday">
+                                                <label class="form-check-label" for="inlineCheckbox1">Wednesday</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="Friday">
+                                                <label class="form-check-label" for="inlineCheckbox2">Friday</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="Saturday">
+                                                <label class="form-check-label" for="inlineCheckbox3">Saturday</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <label for="inputProfilePicture">Profile Picture</label>
+                                            <div class="file-drop-area">
+                                                <span class="choose-file-button">Choose file</span>
+                                                <span class="file-message">or drag and drop here</span>
+                                                <input class="file-input" type="file">
+                                            </div>
+                                        </div>
+                                      </form>
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Add Walker</button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                          
                         <!-- Active walkers table -->
-                        <table class="table new-requests table-responsive">
-                            <thead class="thead-light">
-                                <tr>
-                                    <h3>Walkers</h3>
-                                    <th scope="col" style="width: 15%">Walker Name 1</th>
-                                    <th scope="col" style="width: 15%">Walker Name 2</th>
-                                    <th scope="col" style="width: 10%">Status</th>
-                                    <th scope="col" style="width: 10%">Chat</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Example row -->
-                                <tr>
-                                    <th scope=" row">Helen Hywater</th>
-                                    <td>Helen Hywater</td>
-                                    <td class="status">On a walk</td>
-                                    <td>
-                                        <span class="material-icons">chat</span>
-                                    </td>
-                                </tr>
-                                <!-- End example row -->
-                            </tbody>
-                        </table>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-auto"><h3>Walkers</h3></div>
+                                <div class="col-md-4 ml-auto text-right">
+                                    <button type="button" class="btn btn-primary ml-auto" data-toggle="modal" data-target="#newWalkerForm">
+                                        Add New Walker
+                                    </button>
+                                </div>
+                                
+                            </div>
+                            <div class="row">
+                                <table class="table new-requests table-responsive">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th scope="col" style="width: 15%">Walker Name 1</th>
+                                            <th scope="col" style="width: 15%">Walker Name 2</th>
+                                            <th scope="col" style="width: 10%">Status</th>
+                                            <th scope="col" style="width: 10%">Chat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Example row -->
+                                        <tr>
+                                            <th scope=" row">Helen Hywater</th>
+                                            <td>Helen Hywater</td>
+                                            <td class="status">On a walk</td>
+                                            <td>
+                                                <span class="material-icons">chat</span>
+                                            </td>
+                                        </tr>
+                                        <!-- End example row -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                         <!-- End of Active walkers table -->
 
 
