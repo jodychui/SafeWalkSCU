@@ -1,3 +1,4 @@
+
 /**
  * @file index.js
  * @author
@@ -427,11 +428,9 @@ function fillAssignedTable(data) {
     if (user.elapsedTime.day >= 1) {
       tr.children[4].textContent = `> ${user.elapsedTime.day} days`;
     } else {
-      tr.children[4].textContent = `${user.elapsedTime.hour} ${
-        user.elapsedTime.hour > 1 ? "hours" : "hour"
-      } ${user.elapsedTime.minute} ${
-        user.elapsedTime.minute > 1 ? "mins" : "min"
-      }`;
+      tr.children[4].textContent = `${user.elapsedTime.hour} ${user.elapsedTime.hour > 1 ? "hours" : "hour"
+        } ${user.elapsedTime.minute} ${user.elapsedTime.minute > 1 ? "mins" : "min"
+        }`;
     }
     tr.children[tr.children.length - 1].addEventListener(
       "click",
@@ -444,7 +443,7 @@ function fillAssignedTable(data) {
  * @param { walker } data 
  * @returns 
  */
-function fillAssignPopup(data){
+function fillAssignPopup(data) {
   const tbody = document.querySelector("#assignPopup");
   if (typeof data === "undefined") {
     clearAssignPopup();
@@ -465,10 +464,10 @@ function fillAssignPopup(data){
   let i = 0;
   let walker = Object.values(data); // array
   for (const tr of tbody.children) {
-    if (typeof walker[i] !== 'undefined'){
+    if (typeof walker[i] !== 'undefined') {
       tr.lastElementChild.firstChild.textContent = walker[i++].name;
     }
-    if (typeof walker[i] !== 'undefined'){
+    if (typeof walker[i] !== 'undefined') {
       tr.lastElementChild.lastChild.textContent = walker[i++].name;
     }
     else {
@@ -503,6 +502,7 @@ async function deleteUserOnClick(e) {
       remove(target);
       document.querySelector('#cancelDelete').click();
   });
+
 }
 
 
@@ -515,9 +515,8 @@ async function deleteUserOnClick(e) {
  *        Alternative to using AddEventListener 'click' event.
  */
 async function deleteUserByToken(userToken, assigned, deleted = true) {
-  const path = `${
-    assigned === "true" ? "assignedUsers" : "unassignedUsers"
-  }/${userToken}`;
+  const path = `${assigned === "true" ? "assignedUsers" : "unassignedUsers"
+    }/${userToken}`;
   console.log(path);
   remove(ref(db, path));
   deleted ? alert("user has been deleted!") : alert("user has been moved!");
@@ -577,12 +576,12 @@ function clearAssignedTable() {
  * @brief Clears the popup to write only and sets the row to write
  *        'No new requests'
  */
- function clearAssignPopup() {
+function clearAssignPopup() {
   const tbody = document.querySelector("#assignPopup");
   const tr = tbody.children;
   if (typeof tr === "undefined") return;
-  if (tr.length > 1){
-    for (let i = 1; i < tr.length;i++){
+  if (tr.length > 1) {
+    for (let i = 1; i < tr.length; i++) {
       tr[i].remove();
     }
   }
@@ -924,4 +923,5 @@ function setTableRefresh(rate) {
 $('#walkersPopUp').on('shown.bs.modal', function () {
   $('#myInput').trigger('focus')
 })
+
 
