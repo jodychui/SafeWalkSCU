@@ -916,8 +916,13 @@ function setTableRefresh(rate) {
   }, rate * 1000);
 }
 
-/* //! ======================== POPUP =========================  */
+/* //! ======================== POPUPS =========================  */
 
-$("#walkersPopUp").on("shown.bs.modal", function () {
-  $("#myInput").trigger("focus");
-});
+
+$('#walkersPopUp').on('shown.bs.modal', function () {
+  $('#myInput').trigger('focus')
+})
+
+$('#deletePopUp').on('shown.bs.modal', function () {
+  $('#myInput').trigger('focus')
+})

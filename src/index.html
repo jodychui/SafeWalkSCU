@@ -112,7 +112,8 @@
                                                 data-target="#walkersPopUp">person_add</span>
                                         </td>
                                         <td class="delete">
-                                            <span class="material-icons">delete</span>
+                                            <span class="material-icons" data-toggle="modal"
+                                                data-target="#deletePopUp">delete</span>
                                         </td>
                                     </tr>
                                     <!-- End example row -->
@@ -124,6 +125,7 @@
                         <!-- Walkers PopUp -->
                         <div class="modal fade" id="walkersPopUp" tabindex="-1" role="dialog"
                             aria-labelledby="walkersPopUpLabel" aria-hidden="true">
+
                             <div class="modal-dialog modal-dialog-centered" role="document" style="
     width: 400px;
 ">
@@ -205,9 +207,34 @@ border-top: none;
         <button type="button" class="btn btn-danger">Assign</button>
     </div>
 </div>
+
                             </div>
                         </div>
                         <!-- End of Walkers PopUp -->
+
+                        <!-- Delete PopUp -->
+                        <div class="modal fade" id="deletePopUp" tabindex="-1" role="dialog"
+                            aria-labelledby="deletePopUpLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deletePopUpLabel">Delete</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h6>Are you sure you want to delete this request?</h4>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-danger">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End of Delete PopUp -->
 
                         <!-- Current Requests table -->
                         <h3>Current Requests</h3>
@@ -241,7 +268,8 @@ border-top: none;
                                             <span class="material-icons">chat</span>
                                         </td>
                                         <td class="delete">
-                                            <span class="material-icons">delete</span>
+                                            <span class="material-icons" data-toggle="modal"
+                                                data-target="#deletePopUp">delete</span>
                                         </td>
                                     </tr>
                                     <!-- End example row -->
