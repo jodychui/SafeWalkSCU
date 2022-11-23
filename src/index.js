@@ -41,11 +41,8 @@ import {
   userGetCheckInTime,
   userSetCheckInTime,
   userSetCheckOutTime,
-
 } from "./classes.js";
-
 import { walker } from "./walker.js";
-
 // import the walker object here!
 
 const firebaseConfig = {
@@ -105,18 +102,25 @@ function initializeData() {
      *  The get() is a firebase function which takes in two params.
      *  1. the databaseReference
      *  2. the path where the database is located. The child() will
-     *     give us the subpath of /users/<this>.
+     *     give us the subpath of /<this>.
      */
-    return get(child(dbRef, "users/"))
+    return get(dbRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
           let obj = {};
-          if (snapshot.hasChild("assigned")) {
-            obj["assigned"] = snapshot.child("assigned").val();
+          if (snapshot.hasChild("assignedUsers")) {
+            obj["assignedUsers"] = snapshot.child("assignedUsers").val();
           }
-          if (snapshot.hasChild("unassigned")) {
-            obj["unassigned"] = snapshot.child("unassigned").val();
+          if (snapshot.hasChild("unassignedUsers")) {
+            obj["unassignedUsers"] = snapshot.child("unassignedUsers").val();
           }
+          if (snapshot.hasChild('unavailableWalkers')){
+            obj['unavailableWalkers'] = snapshot.child('unavailableWalkers').val();
+          }
+          if (snapshot.hasChild('availableWalkers')){
+            obj['availableWalkers'] = snapshot.child('availableWalkers').val();
+          }
+
           /* Promise is resolved here.  */
           resolve(obj);
         } else {
@@ -137,9 +141,10 @@ function initializeData() {
     /* First and foremost we convert necessary properties to objects. */
     globalUserData = data;
     stringToJSON(globalUserData);
-
-    fillUnassignedTable(globalUserData["unassigned"]);
-    fillAssignedTable(globalUserData["assigned"]);
+    organizePair(globalUserData);
+    console.log(globalUserData)
+    fillUnassignedTable(globalUserData["unassignedUsers"]);
+    fillAssignedTable(globalUserData["assignedUsers"]);
 
     showLastRefreshed();
     return data;
@@ -150,14 +155,14 @@ function initializeData() {
  * @function writeUserData
  * @param {user} user
  * @brief Takes user (walkee) object and writes to the database in
- * database path `/users/<authorizationToken>`.
+ * database path `/<authorizationToken>`.
  * */
 function writeUserData(user) {
   /* Whenever we're writing we need to get the reference to the 
      database, and we can do so initializing it with a getDatabase() method.
   */
   set(
-    ref(db, `users/${user.assigned ? "assigned" : "unassigned"}/` + user.token),
+    ref(db, `${user.assigned ? "assignedUsers" : "unassignedUsers"}/` + user.token),
     {
       token: user.token,
       name: user.name,
@@ -183,31 +188,28 @@ function writeUserData(user) {
 
 /**
  * @function writeWalkerData
- * @param {user} user
+ * @param {walker} walker
  * @var assigned shows if user is assigned to a walker
  * @brief Takes user (walker) object and writes to the database in
  * database path `/walkers/<authorizationToken>`.
  * */
-
 function writeWalkerData(walker) {
-  const db = getDatabase(); //get reference to database
-  set(
-    ref(
-      db,
-      `walkers/${walker.onWalk ? "unavailable" : "available"}/` + walkerToken[0]
-    ),
-    {
-      token: walker.token,
-      name: walker.name,
-      email: walker.email,
-      phoneNumber: walker.phoneNumber,
-      available: walker.onDuty && !walker.onWalk, //!!check this
-      unavailable: !walker.onDuty || walker.onWalk,
-      pairedWith: walker.pairedWith,
-      currentLocation: walker.currentLocation,
-      completedWalk: walker.completedWalk,
-    }
-  );
+  const path =
+    walker.onDuty && !walker.onWalk ? "availableWalkers" : "unavailableWalkers";
+  set(ref(db, `${path}/` + walkerToken[0]), {
+    token: walker.token,
+    name: walker.name,
+    email: walker.email,
+    phoneNumber: walker.phoneNumber,
+    available: walker.onDuty && !walker.onWalk, //!!check this
+    // unavailable: !walker.onDuty || walker.onWalk,
+    checkInTime: walker.checkInTime.dateObj.toString(),
+    checkOutTime: walker.checkOutTime.dateObj.toString(),
+
+    pairedWith: walker.pairedWith,
+    currentLocation: walker.currentLocation,
+    completedWalk: walker.completedWalk,
+  });
 }
 
 /**
@@ -282,37 +284,31 @@ async function main() {
     ],
     assigned: [false, false, false, true],
   };
-  let arr = [];
-  for (let i = 0; i < 3; i++) {
-    let user1 = new user(
-      fields.userToken[i],
-      fields.names[i],
-      fields.emails[i],
-      fields.phoneNumbers[i],
-      fields.srcAddressL1[i],
-      "",
-      fields.dstAddressL1[i]
-    );
-    user1.assigned = fields.assigned[i];
-    userSetCheckInTime(user1);
+  // let arr = [];
+  // for (let i = 0; i < 1; i++) {
+  //   let user1 = new user(
+  //     fields.userToken[i],
+  //     fields.names[i],
+  //     fields.emails[i],
+  //     fields.phoneNumbers[i],
+  //     fields.srcAddressL1[i],
+  //     "",
+  //     fields.dstAddressL1[i]
+  //   );
+  //   user1.assigned = fields.assigned[i];
+  //   userSetCheckInTime(user1);
 
-    arr.push(user1);
-    // writeUserData(user1);
-  }
-  const user1 = new user(
-    "f",
-    "shamwow",
-    "shamwow@ucsd.edu",
-    "341-321-1231",
-    "Shammy ave",
-    "",
-    "el camino rd"
+  //   arr.push(user1);
+  //   writeUserData(user1);
+  // }
+  const walker1 = new walker('z','Xavier', 'Xav@scu.edu','714-324-3212', true, false, 'El Macho Blvd' , false
   );
-  user1.assigned = true;
-  // userSetCheckInTime(user1);
-  // writeUserData(user1);
+  walker1.assigned = false;
+  userSetCheckInTime(walker1);
+  writeWalkerData(walker1);
+   
 
-  initializeData();
+  // initializeData();
   setTableRefresh(1);
 }
 
@@ -327,7 +323,7 @@ main();
  * */
 function fillUnassignedTable(data) {
   /* 1. First, create a table row and create a reference to the tbody.*/
-  const tbody = document.querySelectorAll(".new-requests>tbody")[0];
+  const tbody = document.querySelector("#unassignedTable");
   const tr = tbody.children[0];
   if (typeof data === "undefined") {
     clearUnassignedTable();
@@ -358,7 +354,7 @@ function fillUnassignedTable(data) {
   for (const tr of tbody.children) {
     const user = Object.values(data)[i++];
     tr.setAttribute("userToken", user.token);
-    tr.setAttribute("assigned", "false");
+    tr.setAttribute("assignedUsers", "false");
     tr.children[0].textContent = `
       ${trailingZeroes(user.checkInTime.hour, 2)}:${trailingZeroes(
       user.checkInTime.minute,
@@ -384,7 +380,7 @@ function fillUnassignedTable(data) {
  *               the time and geolocation.
  * */
 function fillAssignedTable(data) {
-  const tbody = document.querySelectorAll(".new-requests>tbody")[1];
+  const tbody = document.querySelector("#assignedTable");
   const tr = tbody.children[0];
   if (typeof data === "undefined") {
     clearAssignedTable();
@@ -409,7 +405,7 @@ function fillAssignedTable(data) {
     userGetElapsedTime(user);
     userGetCheckInTime(user);
     tr.setAttribute("userToken", user.token);
-    tr.setAttribute("assigned", true);
+    tr.setAttribute("assignedUsers", true);
     tr.children[0].textContent = `
     ${trailingZeroes(user.checkInTime.hour, 2)}:${trailingZeroes(
       user.checkInTime.minute,
@@ -419,12 +415,13 @@ function fillAssignedTable(data) {
     tr.children[2].textContent = user.addresses.dstAddressL1 + " ";
     tr.children[3].textContent = "TODO";
     if (user.elapsedTime.day >= 1) {
-      tr.children[4].textContent = `> ${user.elapsedTime.day} days`
-    }
-    else {
-      tr.children[4].textContent = `${user.elapsedTime.hour} ${user.elapsedTime.hour > 1 ? "hours" : "hour"
-        } ${user.elapsedTime.minute} ${user.elapsedTime.minute > 1 ? "mins" : "min"
-        }`;
+      tr.children[4].textContent = `> ${user.elapsedTime.day} days`;
+    } else {
+      tr.children[4].textContent = `${user.elapsedTime.hour} ${
+        user.elapsedTime.hour > 1 ? "hours" : "hour"
+      } ${user.elapsedTime.minute} ${
+        user.elapsedTime.minute > 1 ? "mins" : "min"
+      }`;
     }
     tr.children[tr.children.length - 1].addEventListener(
       "click",
@@ -446,12 +443,13 @@ function fillAssignedTable(data) {
 async function deleteUserOnClick(e) {
   console.log(`you clicked ${e.currentTarget}!!`);
   const userToken = e.currentTarget.parentNode.getAttribute("userToken");
-  const assigned = e.currentTarget.parentNode.getAttribute("assigned");
+  const assigned = e.currentTarget.parentNode.getAttribute("assignedUsers");
 
   /* 1. Create a reference to the db with the given userToken. and get its 
         directory. */
-  const path = `users/${assigned === "true" ? "assigned" : "unassigned"
-    }/${userToken}`;
+  const path = `${
+    assigned === "true" ? "assignedUsers" : "unassignedUsers"
+  }/${userToken}`;
   console.log(path);
   const target = ref(db, path);
   /* 2. Call the firebase remove() */
@@ -470,8 +468,9 @@ async function deleteUserOnClick(e) {
  *        Alternative to using AddEventListener 'click' event.
  */
 async function deleteUserByToken(userToken, assigned, deleted = true) {
-  const path = `users/${assigned === "true" ? "assigned" : "unassigned"
-    }/${userToken}`;
+  const path = `${
+    assigned === "true" ? "assignedUsers" : "unassignedUsers"
+  }/${userToken}`;
   console.log(path);
   remove(ref(db, path));
   deleted ? alert("user has been deleted!") : alert("user has been moved!");
@@ -485,7 +484,7 @@ async function deleteUserByToken(userToken, assigned, deleted = true) {
  *        'No new requests'
  */
 function clearUnassignedTable() {
-  const tbody = document.querySelectorAll(".new-requests>tbody")[0];
+  const tbody = document.querySelector("#unassignedTable");
   const tr = tbody.children[0];
   if (typeof tr === "undefined") return;
   if (tr.children.length > 0) {
@@ -508,7 +507,7 @@ function clearUnassignedTable() {
  *        'No new requests'
  */
 function clearAssignedTable() {
-  const tbody = document.querySelectorAll(".new-requests>tbody")[1];
+  const tbody = document.querySelector("#assignedTable");
   const tr = tbody.children[0];
   if (typeof tr === "undefined") return;
   if (tr.children.length > 0) {
@@ -572,7 +571,7 @@ function showLastRefreshed() {
  * Takes a userToken to move the corresponding row into the assigned table.
  */
 function moveToAssigned(userToken) {
-  let newAssignedUser = globalUserData["unassigned"][userToken];
+  let newAssignedUser = globalUserData["unassignedUsers"][userToken];
   if (typeof newAssignedUser === "undefined") {
     return;
   }
@@ -612,7 +611,7 @@ function trailingZeroes(number, howMany) {
 function cloneEmptyElements() {
   /* For Unassigned Table Row */
   let arr = [];
-  let row1 = document.querySelector("tbody").children[0];
+  let row1 = document.querySelector("#unassignedTable").children[0];
   let newRow1 = row1.cloneNode(true);
   for (let i = 0; i < 4; i++) {
     newRow1.children[i].textContent = "";
@@ -620,7 +619,7 @@ function cloneEmptyElements() {
   arr["unassignedRow"] = newRow1;
 
   /* For assigned Table Row */
-  let row2 = document.querySelectorAll("tbody")[1].children[0];
+  let row2 = document.querySelector('#assignedTable').children[0];
   let newRow2 = row2.cloneNode(true);
   for (let i = 0; i < 5; i++) {
     newRow2.children[i].textContent = "";
@@ -640,8 +639,8 @@ function cloneEmptyElements() {
  *              'unassigned.'
  */
 function stringToJSON(data) {
-  if (typeof data["unassigned"] !== "undefined") {
-    Object.values(data["unassigned"]).forEach(
+  if (typeof data["unassignedUsers"] !== "undefined") {
+    Object.values(data["unassignedUsers"]).forEach(
       /**
        * @param {user} user
        */
@@ -652,7 +651,7 @@ function stringToJSON(data) {
           dateObj: dateObj,
           hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
           minute: dateObj.getMinutes(),
-          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
         };
         user.checkInTime = checkInTime;
 
@@ -661,7 +660,7 @@ function stringToJSON(data) {
           dateObj: dateObj,
           hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
           minute: dateObj.getMinutes(),
-          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
         };
         user.checkOutTime = checkOutTime;
 
@@ -675,8 +674,8 @@ function stringToJSON(data) {
       }
     );
   }
-  if (typeof data["assigned"] !== "undefined") {
-    Object.values(data["assigned"]).forEach(
+  if (typeof data["assignedUsers"] !== "undefined") {
+    Object.values(data["assignedUsers"]).forEach(
       /**
        * @param {user} user
        */
@@ -687,7 +686,7 @@ function stringToJSON(data) {
           dateObj: dateObj,
           hour: dateObj.getHours() % 12,
           minute: dateObj.getMinutes(),
-          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
         };
         user.checkInTime = checkInTime;
 
@@ -696,7 +695,7 @@ function stringToJSON(data) {
           dateObj: dateObj,
           hour: dateObj.getHours() % 12,
           minute: dateObj.getMinutes(),
-          meridiem: dateObj.getHours() / 12 > 1 ? "PM" : "AM",
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
         };
         user.checkOutTime = checkOutTime;
 
@@ -707,10 +706,108 @@ function stringToJSON(data) {
           minute: dateObj.getMinutes(),
         };
         user.elapsedTime = elapsedTime;
+      }
+    );
+  }
+  if (typeof data["availableWalkers"] !== "undefined") {
+    Object.values(data["availableWalkers"]).forEach(
+      /**
+       * @param {walker} walker
+       */
+      function (walker) {
+        /* Extract values for the checkInTime to an object... */
+        let dateObj = new Date(walker.checkInTime);
+        const checkInTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
+        };
+        walker.checkInTime = checkInTime;
+
+        dateObj = new Date(walker.checkOutTime);
+        const checkOutTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
+        };
+        walker.checkOutTime = checkOutTime;
+      }
+    );
+  }
+  if (typeof data["unavailableWalkers"] !== "undefined") {
+    Object.values(data["unavailableWalkers"]).forEach(
+      /**
+       * @param {walker} walker
+       */
+      function (walker) {
+        /* Extract values for the checkInTime to an object... */
+        let dateObj = new Date(walker.checkInTime);
+        const checkInTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
+        };
+        walker.checkInTime = checkInTime;
+
+        dateObj = new Date(walker.checkOutTime);
+        const checkOutTime = {
+          dateObj: dateObj,
+          hour: dateObj.getHours() % 12 === 0 ? 12 : dateObj.getHours() % 12,
+          minute: dateObj.getMinutes(),
+          meridiem: dateObj.getHours() >= 12 ? "PM" : "AM",
+        };
+        walker.checkOutTime = checkOutTime;
       }
     );
   }
   return data;
+}
+
+/**
+ * @function organizePair
+ * @param {Object} globalUserObj 
+ * @brief  Parses the information in FirebaseDB to create a pair, under 
+ *         `globalUserData['pairs']`, using the user token as the key, and 
+ *         the three user/walkers object as values. 
+ * @precondition There must be even number of available or unavailable walkers
+ *         and its properties have been fully converted to JS objects.
+ */
+function organizePair(globalUserObj){
+    if (typeof globalUserObj['unavailableWalkers'] !== 'undefined'){
+      /* You must first create an object in pairs before you create an array
+         per pair */
+      let newPairLocation =  globalUserObj['pairs'] = {};
+
+      /* Then we can create an array for every assigned users. */
+      Object.keys(globalUserObj['assignedUsers']).forEach(function (userToken){
+        newPairLocation[userToken] = [];
+      } );
+      Object.values(globalUserObj.unavailableWalkers).forEach(
+        /**
+         * @param {walker} walker
+         */
+        function (walker) {
+          /* 1. Get the user token */
+          const sharedToken = walker.pairedWith.userToken;
+          /* 2. Get the user object */
+          const pairedUser = globalUserObj['assignedUsers'][sharedToken];
+
+          /*  This *should* store the user information and the walkers together
+              Recall that two walkers share the same userID, so we gotta filter 
+              that out. */
+          if (!newPairLocation[sharedToken].includes(pairedUser)){
+            newPairLocation[sharedToken].push(pairedUser);
+          }
+          newPairLocation[sharedToken].push(walker);
+        }
+      );
+    }
+    
+    // console.log(globalUserObj);
+    // If there are available walkers, do nothing.
 }
 
 /* //! ======================== PAGE ERROR HANDLING =========================  */
@@ -721,8 +818,8 @@ function stringToJSON(data) {
  */
 function setTableRefresh(rate) {
   const intervalID = setInterval(function () {
-    fillAssignedTable(globalUserData["assigned"]);
-    fillUnassignedTable(globalUserData["unassigned"]);
+    fillAssignedTable(globalUserData["assignedUsers"]);
+    fillUnassignedTable(globalUserData["unassignedUsers"]);
   }, rate * 1000);
 }
 

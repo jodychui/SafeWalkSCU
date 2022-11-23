@@ -68,6 +68,9 @@ const userGetElapsedTime = function (userObj) {
 /** 
  * @function userGetCheckInTime
  * @param {user} userObj 
+ * @brief Retrieves the user's check in time by performing the date arithmetic.
+ *        Returns a new date object that holds the Date object itself, hour,
+ *        minute, and meridiem.
 */
 const userGetCheckInTime = function (userObj) {
   const d = new Date(userObj.checkInTime.dateObj);
