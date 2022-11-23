@@ -822,3 +822,9 @@ function setTableRefresh(rate) {
     fillUnassignedTable(globalUserData["unassignedUsers"]);
   }, rate * 1000);
 }
+
+/* //! ======================== POPUP =========================  */
+
+$('#walkersPopUp').on('shown.bs.modal', function () {
+  $('#myInput').trigger('focus')
+})
