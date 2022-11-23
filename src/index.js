@@ -487,23 +487,24 @@ function fillAssignPopup(data){
  *        of td (the <tr>).
  */
 async function deleteUserOnClick(e) {
-  console.log(`you clicked ${e.currentTarget}!!`);
   const userToken = e.currentTarget.parentNode.getAttribute("userToken");
   const assigned = e.currentTarget.parentNode.getAttribute("assignedUsers");
 
-  /* 1. Create a reference to the db with the given userToken. and get its 
-        directory. */
-  const path = `${
-    assigned === "true" ? "assignedUsers" : "unassignedUsers"
-  }/${userToken}`;
-  console.log(path);
-  const target = ref(db, path);
-  /* 2. Call the firebase remove() */
-  remove(target);
-  alert("user has been deleted!");
-
-  // initializeData();
+  $('#confirmDelete').click((event)=> {
+    console.log(`you clicked ${event.currentTarget}!!`);
+      /* 1. Create a reference to the db with the given userToken. and get its 
+            directory. */
+      const path = `${
+        assigned === "true" ? "assignedUsers" : "unassignedUsers"
+      }/${userToken}`;
+      console.log(path);
+      const target = ref(db, path);
+      /* 2. Call the firebase remove() */
+      remove(target);
+      document.querySelector('#cancelDelete').click();
+  });
 }
+
 
 /**
  * @function deleteUserByToken
@@ -869,7 +870,8 @@ function stringToJSON(data) {
  *         and its properties have been fully converted to JS objects.
  */
 function organizePair(globalUserObj) {
-  if (typeof globalUserObj["unavailableWalkers"] !== "undefined") {
+  if (typeof globalUserObj["unavailableWalkers"] !== "undefined"
+   && typeof globalUserObj['assignedUsers'] !== 'undefined' ) {
     /* You must first create an object in pairs before you create an array
          per pair */
     let newPairLocation = (globalUserObj["pairs"] = {});
@@ -923,6 +925,3 @@ $('#walkersPopUp').on('shown.bs.modal', function () {
   $('#myInput').trigger('focus')
 })
 
-$('#deletePopUp').on('shown.bs.modal', function () {
-  $('#myInput').trigger('focus')
-})
