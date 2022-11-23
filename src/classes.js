@@ -1,12 +1,3 @@
-/* objects as 'classes' 
-Admin should be able to store  */
-/* class Admin {
-    constructor (email, addWalker, removeWalker, 
-        createPair, removePair, editPairs, 
-        deleteRequest, assignWalker);
-    }
-    */
-
 function user(
   token,
   name,
@@ -27,53 +18,102 @@ function user(
     dstAddressL1: dstAddressL1,
     dstAddressL2: dstAddressL2,
   };
-  this.checkInTime = function () {
-    const d = new Date();
-    const obj = {
-      dateObj: d /* In case we need to perform date 
-                                     arithmetics, such as getElapsedTime() */,
-      hour: d.getHours(),
-      minute: d.getMinutes(),
-    };
 
-    this.checkInTime = obj;
-  };
-
-  this.setCheckOutTime = function () {
-    const d = new Date();
-    const obj = {
-      dateObj: d,
-      hour: d.getHours(),
-      minute: d.getMinutes(),
-    };
-    this.checkOutTime = obj;
-  };
-  /* Calculate the difference in time, returns the difference in minutes */
-  this.getElapsedTime = function () {
-    if (this.checkInTime === undefined || this.checkOutTime === undefined) {
-      console.log("Please set the checkin/checkout time first");
-      return;
-    }
-    const difference = Math.abs(
-      this.checkInTime.dateObj - this.checkOutTime.dateObj
-    );
-
-    return difference / 60000;
-  };
   /* fields */
   this.assigned = true;
-  (this.pairedWith = " "),
-    (this.checkInTime = {
-      dateObj: new Date(),
-      hour: 0,
-      minute: 0,
-    });
+  this.pairedWalkers = {
+    walker1Token: "",
+    walker2Token: "",
+  };
+  this.checkInTime = {
+    dateObj: new Date(),
+    hour: 0,
+    minute: 0,
+    meridiem: "",
+  };
   this.checkOutTime = {
+    dateObj: new Date(),
+    hour: 0,
+    minute: 0,
+  };
+  this.elapsedTime = {
     dateObj: new Date(),
     hour: 0,
     minute: 0,
   };
 }
 
-export { user };
+/* Calculate the difference in time, returns the difference in minutes */
+/**
+ * @function userGetElapsedTime
+ * @param {user} userObj
+ * @return elapsedTime object
+ * @brief Retrieves the user elapsed time as an object and stores into its
+ * checkInTime property.
+ * @precondition The user check in time has already been recorded by calling
+ *               userCheckInTime().
+ */
+const userGetElapsedTime = function (userObj) {
+  let difference = new Date(Math.abs(new Date() - userObj.checkInTime.dateObj));
+  const obj = {
+    dateObj: difference,
+    hour: Math.floor(difference.getTime() / 3600000),  // in milliseconds to hrs
+    minute: difference.getMinutes(),
+    day: Math.floor(difference.getTime() / 86400000), // in milliseconds to days
+  };
+  userObj.elapsedTime = obj;
+  return obj;
+};
 
+/** 
+ * @function userGetCheckInTime
+ * @param {user} userObj 
+*/
+const userGetCheckInTime = function (userObj) {
+  const d = new Date(userObj.checkInTime.dateObj);
+  const obj = {
+    dateObj: d /* In case we need to perform date 
+                                   arithmetics, such as getElapsedTime() */,
+    hour: (d.getHours() % 12  === 0) ? 12 : d.getHours() % 12,
+    minute: d.getMinutes(),
+    meridiem: d.getHours() / 12 > 1 ? "PM" : "AM",
+  };
+  
+  userObj.checkInTime = obj;
+};
+
+
+/**
+ * @function
+ * @param {user} userObj
+ * @brief Initializes the user check in time as an object and stores into its
+ * checkOutTime property.
+ */
+const userSetCheckOutTime = function (userObj) {
+  const d = new Date();
+  const obj = {
+    dateObj: d /* In case we need to perform date 
+                                   arithmetics, such as getElapsedTime() */,
+  };
+  userObj.checkOutTime = obj;
+};
+
+/**
+ * @function userSetCheckInTime
+ * @param {user} userObj
+ * @brief Initializes the user check in time as an object and stores into its
+ * checkInTime property.
+ */
+const userSetCheckInTime = function (userObj) {
+  const d = new Date();
+  const obj = {
+    dateObj: d /* In case we need to perform date 
+                                   arithmetics, such as getElapsedTime() */,
+  
+  };
+  userObj.checkInTime = obj;
+};
+
+
+
+export { user, userGetElapsedTime, userSetCheckInTime, userSetCheckOutTime, userGetCheckInTime };
