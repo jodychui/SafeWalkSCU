@@ -41,7 +41,7 @@ import {
   userGetCheckInTime,
   userSetCheckInTime,
   userSetCheckOutTime,
-  
+
 } from "./classes.js";
 
 import { walker } from "./walker.js";
@@ -418,16 +418,13 @@ function fillAssignedTable(data) {
     tr.children[1].textContent = user.name;
     tr.children[2].textContent = user.addresses.dstAddressL1 + " ";
     tr.children[3].textContent = "TODO";
-    if (user.elapsedTime.day >= 1){
+    if (user.elapsedTime.day >= 1) {
       tr.children[4].textContent = `> ${user.elapsedTime.day} days`
     }
-    else{
-      tr.children[4].textContent = `${user.elapsedTime.hour} ${
-        
-          user.elapsedTime.hour > 1 ? "hours" : "hour"
-      } ${user.elapsedTime.minute} ${
-        user.elapsedTime.minute > 1 ? "mins" : "min"
-      }`;
+    else {
+      tr.children[4].textContent = `${user.elapsedTime.hour} ${user.elapsedTime.hour > 1 ? "hours" : "hour"
+        } ${user.elapsedTime.minute} ${user.elapsedTime.minute > 1 ? "mins" : "min"
+        }`;
     }
     tr.children[tr.children.length - 1].addEventListener(
       "click",
@@ -453,9 +450,8 @@ async function deleteUserOnClick(e) {
 
   /* 1. Create a reference to the db with the given userToken. and get its 
         directory. */
-  const path = `users/${
-    assigned === "true" ? "assigned" : "unassigned"
-  }/${userToken}`;
+  const path = `users/${assigned === "true" ? "assigned" : "unassigned"
+    }/${userToken}`;
   console.log(path);
   const target = ref(db, path);
   /* 2. Call the firebase remove() */
@@ -474,9 +470,8 @@ async function deleteUserOnClick(e) {
  *        Alternative to using AddEventListener 'click' event.
  */
 async function deleteUserByToken(userToken, assigned, deleted = true) {
-  const path = `users/${
-    assigned === "true" ? "assigned" : "unassigned"
-  }/${userToken}`;
+  const path = `users/${assigned === "true" ? "assigned" : "unassigned"
+    }/${userToken}`;
   console.log(path);
   remove(ref(db, path));
   deleted ? alert("user has been deleted!") : alert("user has been moved!");
@@ -731,8 +726,12 @@ function setTableRefresh(rate) {
   }, rate * 1000);
 }
 
-/* //! ======================== POPUP =========================  */
+/* //! ======================== POPUPS =========================  */
 
 $('#walkersPopUp').on('shown.bs.modal', function () {
+  $('#myInput').trigger('focus')
+})
+
+$('#deletePopUp').on('shown.bs.modal', function () {
   $('#myInput').trigger('focus')
 })
