@@ -100,7 +100,7 @@
                                         <th scope="col" style="width: 5%">Delete</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="unassignedTable">
                                     <!-- Example row -->
                                     <tr>
                                         <th scope="row">11:39 PM</th>
@@ -124,47 +124,160 @@
                         <!-- Walkers PopUp -->
                         <div class="modal fade" id="walkersPopUp" tabindex="-1" role="dialog"
                             aria-labelledby="walkersPopUpLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="walkersPopUpLabel">Assign to Groups</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <table class="table new-requests table-responsive">
-                                            <h6>Unassigned groups</h4>
-                                                <!-- Example row -->
-                                                <tr>
-                                                    <td style="width:10%">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" value=""
-                                                                id="flexCheckDefault" />
-                                                        </div>
-                                                    </td>
-                                                    <td class="walkers-profiles" style="max-width: 45%">
-                                                        <img class="rounded-circle profile-pic-small" alt="avatar"
-                                                            src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80" />
-                                                        <img class="rounded-circle profile-pic-small" alt="avatar"
-                                                            src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80" />
-                                                    </td>
-                                                    <td style="width: 45%">
-                                                        Name #1
-                                                        <br>
-                                                        Name #2
-                                                    </td>
-                                                </tr>
-                                                <!-- End of example row -->
-
-                                        </table>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-danger">Assign</button>
-                                    </div>
-                                </div>
+                            <div class="modal-dialog modal-dialog-centered" role="document" style="
+    width: 400px;
+">
+<div class="modal-content">
+    <div class="modal-header" style="padding: 1rem 2rem 0 2rem;border-bottom: none;">
+        
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+    </div>
+    <div class="modal-body" style="
+padding: 0 2rem;
+">
+<h2 style="
+text-align: center;
+margin: 0;
+font-weight: 800;
+">Assign to group</h2>
+        <h6 style="
+        text-align: center;
+        margin: 0.5rem 0;
+    ">Unassigned groups</h6><table class="table new-requests table-responsive" id="unassignedPopup" style="
+        margin: 0px;
+    ">
+                                                
+                                                    
+    <!-- Example row -->
+    
+    <tbody style="
+    display: flex;
+    flex-direction: column;
+    /* border-top: none; */
+    ">
+                                                            
+                                                        <tr style="
+            display: flex;
+        ">
+                                                            <td style="display: flex;border-top: none;align-items: center;">
+                                                                <div class="form-check" style="
+        height: 13px;
+        width: 13px;
+        padding-left: 1.25rem;
+        padding-bottom: 1.25rem;
+        ">
+                                                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" style="
+    ">
+                                                                </div>
+                                                            </td>
+                                                            <td class="walkers-profiles" style="width: 35%;border-top: none;display: flex;justify-content: space-between;align-items: center;">
+                                                                <img class="rounded-circle profile-pic-small" alt="avatar" src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1180&amp;q=80" style="
+    min-width: 43px;
+    height: 43px;
+    ">
+                                                                <img class="rounded-circle profile-pic-small" alt="avatar" src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1180&amp;q=80" style="
+    min-width: 43px;
+    height: 43;
+    ">
+                                                            </td>
+                                                            <td style="width: 55%;border-top: none;display: flex;flex-direction: column;justify-content: space-between;">
+            <p style="
+            margin: 0;
+            font-weight: 900;
+            font-size: larger;
+        ">Brian</p>
+            <p style="
+            margin: 0;
+            font-weight: 900;
+            font-size: larger;
+        ">Nyugen</p>
+        </td>
+                                                        </tr><tr style="
+            display: flex;
+        ">
+                                                            <td style="display: flex;align-items: center;">
+                                                                <div class="form-check" style="
+        height: 13px;
+        width: 13px;
+        padding-left: 1.25rem;
+        padding-bottom: 1.25rem;
+        ">
+                                                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" style="
+    ">
+                                                                </div>
+                                                            </td>
+                                                            <td class="walkers-profiles" style="width: 35%;display: flex;justify-content: space-between;align-items: center;">
+                                                                <img class="rounded-circle profile-pic-small" alt="avatar" src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1180&amp;q=80" style="
+    min-width: 43px;
+    height: 43px;
+    ">
+                                                                <img class="rounded-circle profile-pic-small" alt="avatar" src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1180&amp;q=80" style="
+    min-width: 43px;
+    height: 43;
+    ">
+                                                            </td>
+                                                            <td style="width: 55%;display: flex;flex-direction: column;justify-content: space-between;">
+            <p style="
+            margin: 0;
+            font-weight: 900;
+            font-size: larger;
+        ">Brian</p>
+            <p style="
+            margin: 0;
+            font-weight: 900;
+            font-size: larger;
+        ">Nyugen</p>
+        </td>
+                                                        </tr><tr style="
+            display: flex;
+        ">
+                                                            <td style="display: flex;align-items: center;">
+                                                                <div class="form-check" style="
+        height: 13px;
+        width: 13px;
+        padding-left: 1.25rem;
+        padding-bottom: 1.25rem;
+        ">
+                                                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" style="
+    ">
+                                                                </div>
+                                                            </td>
+                                                            <td class="walkers-profiles" style="width: 35%;display: flex;justify-content: space-between;align-items: center;">
+                                                                <img class="rounded-circle profile-pic-small" alt="avatar" src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1180&amp;q=80" style="
+    min-width: 43px;
+    height: 43px;
+    ">
+                                                                <img class="rounded-circle profile-pic-small" alt="avatar" src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1180&amp;q=80" style="
+    min-width: 43px;
+    height: 43;
+    ">
+                                                            </td>
+                                                            <td style="width: 55%;display: flex;flex-direction: column;justify-content: space-between;">
+            <p style="
+            margin: 0;
+            font-weight: 900;
+            font-size: larger;
+        ">Channing</p>
+            <p style="
+            margin: 0;
+            font-weight: 900;
+            font-size: larger;
+        ">Florez</p>
+        </td>
+                                                        </tr><!-- End of example row -->
+        
+                                                </tbody></table>
+    </div>
+    <div class="modal-footer" style="
+justify-content: center;
+border-top: none;
+">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger">Assign</button>
+    </div>
+</div>
                             </div>
                         </div>
                         <!-- End of Walkers PopUp -->
@@ -184,7 +297,7 @@
                                         <th scope="col" style="width: 5%">Delete</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="assignedTable">
                                     <!-- Example row -->
                                     <tr>
                                         <th scope="row">11:39 PM</th>

@@ -309,7 +309,7 @@ async function main() {
    
 
   // initializeData();
-  setTableRefresh(1);
+  // setTableRefresh(1);
 }
 
 main();
@@ -391,13 +391,13 @@ function fillAssignedTable(data) {
   }
   const dataSize = Object.keys(data).length;
   [...tbody.children].forEach((node) => {
-    node.remove();
+      node.remove();
   });
   for (let i = 0; i < dataSize; i++) {
     const newRow = emptyElements["assignedRow"].cloneNode(true);
+    console.log(newRow);
     tbody.appendChild(newRow);
   }
-
   let i = 0;
   for (const tr of tbody.children) {
     let user = Object.values(data)[i++];
@@ -413,7 +413,7 @@ function fillAssignedTable(data) {
     )} ${user.checkInTime.meridiem}`;
     tr.children[1].textContent = user.name;
     tr.children[2].textContent = user.addresses.dstAddressL1 + " ";
-    tr.children[3].textContent = "TODO";
+    // tr.children[3].textContent = "TODO";
     if (user.elapsedTime.day >= 1) {
       tr.children[4].textContent = `> ${user.elapsedTime.day} days`;
     } else {
@@ -622,7 +622,10 @@ function cloneEmptyElements() {
   let row2 = document.querySelector('#assignedTable').children[0];
   let newRow2 = row2.cloneNode(true);
   for (let i = 0; i < 5; i++) {
-    newRow2.children[i].textContent = "";
+    if (i !== 3){
+      // At index 3 is where the profile pictures are. Do not overwrite.
+      newRow2.children[i].textContent = "";
+    }
   }
   arr["assignedRow"] = newRow2;
 
