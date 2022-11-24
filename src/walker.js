@@ -28,8 +28,27 @@ function walker( //function that returns an object
       this.phoneNumber = phoneNumber;
       this.onDuty = onDuty;
       this.onWalk = onWalk;
-      this.pairedWith = ''//not in parameter
+      this.pairedWith = {
+        walkerPairToken: '',
+        userToken: '',
+      }
       //this.photo = photo,
+      this.checkInTime = {
+        dateObj: new Date(),
+        hour: 0,
+        minute: 0,
+        meridiem: "",
+      };
+      this.checkOutTime = {
+        dateObj: new Date(),
+        hour: 0,
+        minute: 0,
+      };
+      this.elapsedTime = {
+        dateObj: new Date(),
+        hour: 0,
+        minute: 0,
+      };
       this.currentLocation = currentLocation;
       this.completedWalk = completedWalk;
     }
