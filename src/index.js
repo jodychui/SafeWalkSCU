@@ -65,6 +65,13 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const db = getDatabase();
+const emptyElements = cloneEmptyElements();
+const dbRef = ref(getDatabase());
+onChildAdded(dbRef, initializeData); //everytime data is changed on the firebase database, it updates the webapp 
+onChildChanged(dbRef, initializeData);
+onChildRemoved(dbRef, initializeData);
+
+let globalUserData = {};
 
 // const userId = auth.currentUser.uid;
 
@@ -76,14 +83,11 @@ const MAX_WALKER_COUNT = 5;
 const userToken = ["a", "b", "c"];
 const adminToken = ["d"];
 const walkerToken = ["e"];
-const dbRef = ref(getDatabase());
-let userData;
 
 /**
  * @function initializeData
- * @brief Asynchronously retrieves user info from the database from /users
- *        directory, stores into globalUserData and update the tables, and
- *        add event listeners to the firebase database to listen for changes.
+ * @brief Asynchronously retrieves user info from the database from root
+ *        directory, stores into globalUserData and update the tables .
  * */
 function initializeData() {
   /* This creates a new promise object which can be either be resolved
@@ -105,9 +109,9 @@ function initializeData() {
     return get(dbRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
-          let obj = {};
+          let obj = {};//Sample globalUserData object - Confluence reference!
           if (snapshot.hasChild("assignedUsers")) {
-            obj["assignedUsers"] = snapshot.child("assignedUsers").val();
+            obj["assignedUsers"] = snapshot.child("assignedUsers").val(); 
           }
           if (snapshot.hasChild("unassignedUsers")) {
             obj["unassignedUsers"] = snapshot.child("unassignedUsers").val();
@@ -608,7 +612,7 @@ function cloneEmptyElements() {
   /* For Unassigned Table Row */
   let arr = [];
   let row1 = document.querySelector("#unassignedTable").children[0];
-  let newRow1 = row1.cloneNode(true);
+  let newRow1 = row1.cloneNode(true); 
   for (let i = 0; i < 4; i++) {
     newRow1.children[i].textContent = "";
   }
@@ -821,6 +825,6 @@ function setTableRefresh(rate) {
 
 /* //! ======================== POPUP =========================  */
 
-$('#walkersPopUp').on('shown.bs.modal', function () {
-  $('#myInput').trigger('focus')
-})
+// $('#walkersPopUp').on('shown.bs.modal', function () {
+//   $('#myInput').trigger('focus')
+// })

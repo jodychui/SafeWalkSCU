@@ -3,7 +3,7 @@
  * @param {String} token 
  * @param {String} name 
  * @param {Boolean} onDuty 
- * @param {Boolean} isAvailable 
+ * @param {Boolean} onWalk 
  * @param {String} email 
  * @param {String} currentLocation 
  * @param {Boolean} completedWalk 
@@ -17,7 +17,7 @@ function walker( //function that returns an object
     email,
     phoneNumber,
     onDuty, 
-    isAvailable, 
+    onWalk, 
     //photo, 
     currentLocation,
     completedWalk
@@ -27,7 +27,7 @@ function walker( //function that returns an object
       this.email = email;
       this.phoneNumber = phoneNumber;
       this.onDuty = onDuty;
-      this.isAvailable = isAvailable;
+      this.onWalk = onWalk;
       this.pairedWith = ''//not in parameter
       //this.photo = photo,
       this.currentLocation = currentLocation;
