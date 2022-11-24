@@ -141,8 +141,8 @@ function initializeData() {
   userData.then(function (data) {
     /* Make a global user data... */
     /* First and foremost we convert necessary properties to objects. */
-    globalUserData = data;
-    stringToJSON(globalUserData);
+    globalUserData = data; //local copy of ALL firebase realtime data
+    stringToJSON(globalUserData); 
     organizePair(globalUserData);
     console.log(globalUserData)
     fillUnassignedTable(globalUserData["unassignedUsers"]);
