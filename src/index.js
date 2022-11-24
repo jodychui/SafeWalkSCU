@@ -151,6 +151,7 @@ function initializeData() {
     fillAssignPopup(globalUserData['availableWalkers']);
 
     showLastRefreshed();
+
     return data;
   });
 }
@@ -203,7 +204,7 @@ function writeUserData(user) {
 function writeWalkerData(walker) {
   const path =
     walker.onDuty && !walker.onWalk ? "availableWalkers" : "unavailableWalkers";
-  set(ref(db, `${path}/` + walkerToken[0]), {
+  set(ref(db, `${path}/` + walker.token), {
     token: walker.token,
     name: walker.name,
     email: walker.email,
@@ -292,7 +293,7 @@ async function main() {
     assigned: [false, false, false, true],
   };
   // let arr = [];
-  // for (let i = 0; i < 1; i++) {
+  // for (let i = 0; i < 2; i++) {
   //   let user1 = new user(
   //     fields.userToken[i],
   //     fields.names[i],
@@ -308,25 +309,25 @@ async function main() {
   //   arr.push(user1);
   //   writeUserData(user1);
   // }
-  const walker1 = new walker(
-    "z",
-    "Xavier",
-    "Xav@scu.edu",
-    "714-324-3212",
-    true,
-    false,
-    "El Macho Blvd",
-    false
-  );
-  walker1.assigned = false;
-  userSetCheckInTime(walker1);
-  writeWalkerData(walker1);
-
-  // initializeData();
+  // const walker1 = new walker(
+  //   "z",
+  //   "Xavier",
+  //   "Xav@scu.edu",
+  //   "714-324-3212",
+  //   true,
+  //   false,
+  //   "El Macho Blvd",
+  //   false
+  // );
+  // walker1.assigned = false;
+  // userSetCheckInTime(walker1);
+  // writeWalkerData(walker1);
+//   setTimeout( ()=> {    moveWalkerToAvail('d');
+// }, 5000);
   // setTableRefresh(1);
 }
-
 main();
+
 /**
  * @function fillUnassignedTable
  * @param { user } data
@@ -378,7 +379,7 @@ function fillUnassignedTable(data) {
     user.addresses.srcAddressL2;
     tr.children[3].textContent = user.addresses.dstAddressL1 + " ";
     user.addresses.dstAddressL2;
-    tr.children[tr.children.length - 1].addEventListener(
+    tr.children[tr.children.length - 1].firstElementChild.addEventListener(
       "click",
       deleteUserOnClick
     );
@@ -432,7 +433,7 @@ function fillAssignedTable(data) {
         } ${user.elapsedTime.minute} ${user.elapsedTime.minute > 1 ? "mins" : "min"
         }`;
     }
-    tr.children[tr.children.length - 1].addEventListener(
+    tr.children[tr.children.length - 1].firstElementChild.addEventListener(
       "click",
       deleteUserOnClick
     );
@@ -461,18 +462,25 @@ function fillAssignPopup(data) {
     const newRow = emptyElements["assignPopup"].cloneNode(true);
     tbody.appendChild(newRow);
   }
-  let i = 0;
+  let i = 0, j = 0;
   let walker = Object.values(data); // array
   for (const tr of tbody.children) {
-    if (typeof walker[i] !== 'undefined') {
-      tr.lastElementChild.firstChild.textContent = walker[i++].name;
+    if ( j > 0){
+      for (const td of tr.children){
+        td.style['border-top'] = '1px solid #dee2e6';
+      }
+
     }
     if (typeof walker[i] !== 'undefined') {
-      tr.lastElementChild.lastChild.textContent = walker[i++].name;
+      tr.lastElementChild.firstElementChild.textContent = walker[i++].name;
+    }
+    if (typeof walker[i] !== 'undefined') {
+      tr.lastElementChild.lastElementChild.textContent = walker[i++].name;
     }
     else {
       tr.children[1].lastElementChild.remove();
     }
+    j++;
   }
 }
 /* //! ==================== DELETION & ADD ACTION ======================== */
@@ -486,21 +494,28 @@ function fillAssignPopup(data) {
  *        of td (the <tr>).
  */
 async function deleteUserOnClick(e) {
-  const userToken = e.currentTarget.parentNode.getAttribute("userToken");
-  const assigned = e.currentTarget.parentNode.getAttribute("assignedUsers");
-
-  $('#confirmDelete').click((event)=> {
-    console.log(`you clicked ${event.currentTarget}!!`);
-      /* 1. Create a reference to the db with the given userToken. and get its 
+  const userToken = e.currentTarget.parentNode.parentNode.getAttribute("userToken");
+  const assigned = e.currentTarget.parentNode.parentNode.getAttribute("assignedUsers");
+  const path = `${
+    assigned === "true" ? "assignedUsers" : "unassignedUsers"
+  }/${userToken}`;
+  e.stopPropagation();
+  console.log('path ', path);
+  $('#confirmDelete').click();
+  $("#confirmDelete").click((event) => {
+    console.log(`you clicked ${userToken}!!`);
+    event.stopPropagation();
+    /* 1. Create a reference to the db with the given userToken. and get its 
             directory. */
-      const path = `${
-        assigned === "true" ? "assignedUsers" : "unassignedUsers"
-      }/${userToken}`;
-      console.log(path);
-      const target = ref(db, path);
-      /* 2. Call the firebase remove() */
-      remove(target);
-      document.querySelector('#cancelDelete').click();
+    console.log(path);
+    const target = ref(db, path);
+    /* 2. Call the firebase remove() */
+    remove(target);
+    if (assigned === true) {
+      // If the user is assigned, then we must free the walkers as well.
+      // moveWalkerToAvail(userToken);
+    }
+    document.querySelector("#cancelDelete").click();
   });
 
 }
@@ -653,7 +668,7 @@ function showLastRefreshed() {
  * @param {String} userToken
  * Takes a userToken to move the corresponding row into the assigned table.
  */
-function moveToAssigned(userToken) {
+function moveUserToAssigned(userToken) {
   let newAssignedUser = globalUserData["unassignedUsers"][userToken];
   if (typeof newAssignedUser === "undefined") {
     return;
@@ -664,7 +679,54 @@ function moveToAssigned(userToken) {
      to 'assigned.'*/
   newAssignedUser.assigned = true;
   writeUserData(newAssignedUser);
-  // initializeData();
+}
+
+/**
+ * @function moveWalkerToAvail
+ * @param {String} userToken 
+ * @brief This function is used when an admin deletes an ongoing user. 
+ *        This means that we will not only remove the user from the pending 
+ *        request in assignedUser but also move walkers from unavailableWalkers 
+ *        to availableWalkers.
+ */
+function moveWalkerToAvail(userToken){
+  let walker1, walker2;
+  if (typeof globalUserData["pairs"][userToken][1] !== "undefined") {
+    walker1 = globalUserData["pairs"][userToken][1];
+    deleteWalkerByToken(walker1.token, false, false);
+    walker1.onWalk = false;
+    walker1.onDuty = true;
+    walker1.pairedWith.walkerPairToken = '';
+    walker1.pairedWith.userToken ='';
+    writeWalkerData(walker1);
+  }
+  if (typeof globalUserData["pairs"][userToken][2] !== "undefined") {
+    walker2 = globalUserData["pairs"][userToken][2];
+    deleteWalkerByToken(walker2.token, false, false);
+    //// We probably should call a function that determines the walkers availability
+    //// schedule here. But this will just be a placeholder for now. 
+    walker2.onDuty = true;
+    walker2.onWalk = false;
+    walker2.pairedWith.walkerPairToken = '';
+    walker2.pairedWith.userToken ='';
+    writeWalkerData(walker2);
+  }
+  
+}
+
+/**
+ * 
+ * @param {String} walkerToken 
+ * @param {Boolean} available 
+ * @param {Boolean} deleted 
+ */
+async function deleteWalkerByToken(walkerToken, available, deleted = true) {
+  const path = `${available === "true" ? "availableWalkers" : "unavailableWalkers"
+    }/${walkerToken}`;
+  console.log(path);
+  remove(ref(db, path));
+  deleted ? alert("walker has been deleted!") : alert("walker has been moved!");
+
 }
 
 /**
