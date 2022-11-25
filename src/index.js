@@ -542,6 +542,7 @@ async function deleteUserByToken(userToken, assigned, deleted = true) {
   // initializeData();
 }
 
+
 /**
  * @function clearUnassignedTable
  * @brief Clears the Unassigned User Table only and sets the row to write
@@ -685,6 +686,23 @@ function moveUserToAssigned(userToken) {
 }
 
 /**
+ * @function moveToUnavailable
+ * @param {String} walkerToken 
+ */
+function moveToUnavailable(walkerToken) {
+  let newUnassignedWalker = globalUserData["availableWalkers"][walkerToken];
+  if (typeof newUnassignedWalker === "undefined") {
+    return;
+  }
+  /* Delete the existing unassigned data. */
+  deleteWalkerByToken(walkerToken, false, false);
+  /* Copy the data to the new unavailable row. Change its status
+     to 'unavailable.'*/
+  newUnassignedWalker.onWalk = true; //change status of walker
+  writeWalkerData(newUnassignedWalker); //update database of new status
+}
+
+/**
  * @function moveWalkerToAvail
  * @param {String} userToken 
  * @brief This function is used when an admin deletes an ongoing user. 
@@ -715,6 +733,45 @@ function moveWalkerToAvail(userToken){
     writeWalkerData(walker2);
   }
   
+}
+
+/**
+ * 
+ * @function moveWalkerToUnavail
+ * @param {String} userToken 
+ * @brief This function is used when an admin assigns a user to two walkers. 
+ *        This means that we will move the user to assignedUsers and the two 
+ *        associated walkers to unAvailableWalkers
+ */
+function moveWalkerToUnavail(userToken) {
+  let walker1, walker2;
+  // CHECK ! go through availableWalkers & get first 2
+    walker1 = globalUserData["availableWalkers"][0];
+    walker2 = globalUserData["availableWalkers"][1];
+
+  if (typeof globalUserData["availableWalkers"][0] !== "undefined") {
+    walker1 = globalUserData["availableWalkers"][0];
+    moveToUnavailable(walker1);
+    walker1.onWalk = true;
+    walker1.onDuty = true;
+    // walker1.pairedWith.walkerPairToken = '';
+    walker1.pairedWith.userToken = userToken;
+    writeWalkerData(walker1);
+  }
+  if (typeof globalUserData["availableWalkers"][1] !== "undefined") {
+    walker2 = globalUserData["availableWalkers"][1];
+    moveToUnavailable(walker2);
+    walker2.onWalk = true;
+    walker2.onDuty = true;
+    walker2.pairedWith.walkerPairToken = walker1;
+    walker2.pairedWith.userToken = userToken;
+    writeWalkerData(walker2);
+  }
+
+  if(walker2!= null) {
+    walker1.pairedWith.walkerPairToken = walker2;
+  }
+
 }
 
 /**
