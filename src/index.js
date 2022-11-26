@@ -331,7 +331,8 @@ async function main() {
   // writeWalkerData(walker1);
 //   setTimeout( ()=> {    moveWalkerToAvail('d');
 // }, 5000);
-  // setTableRefresh(1);
+//   setTableRefresh(1);
+
 }
 main();
 
@@ -386,8 +387,11 @@ function fillUnassignedTable(data) {
     user.addresses.srcAddressL2;
     tr.children[3].textContent = user.addresses.dstAddressL1 + " ";
     user.addresses.dstAddressL2;
-    tr.children[tr.children.length - 1].firstElementChild.addEventListener(
-      "click",
+    // tr.children[tr.children.length - 1].firstElementChild.addEventListener(
+    //   "click",
+    //   deleteUserOnClick
+    // );
+    $(tr.children[tr.children.length - 1].firstElementChild).click(
       deleteUserOnClick
     );
   }
@@ -440,8 +444,7 @@ function fillAssignedTable(data) {
         } ${user.elapsedTime.minute} ${user.elapsedTime.minute > 1 ? "mins" : "min"
         }`;
     }
-    tr.children[tr.children.length - 1].firstElementChild.addEventListener(
-      "click",
+    $(tr.children[tr.children.length - 1].firstElementChild).click(
       deleteUserOnClick
     );
   }
@@ -501,30 +504,33 @@ function fillAssignPopup(data) {
  *        of td (the <tr>).
  */
 async function deleteUserOnClick(e) {
-  const userToken = e.currentTarget.parentNode.parentNode.getAttribute("userToken");
-  const assigned = e.currentTarget.parentNode.parentNode.getAttribute("assignedUsers");
+  const userToken =
+    e.currentTarget.parentNode.parentNode.getAttribute("userToken");
+  const assigned =
+    e.currentTarget.parentNode.parentNode.getAttribute("assignedUsers");
   const path = `${
     assigned === "true" ? "assignedUsers" : "unassignedUsers"
   }/${userToken}`;
-  e.stopPropagation();
-  console.log('path ', path);
-  $('#confirmDelete').click();
-  $("#confirmDelete").click((event) => {
+  
+  console.log("path ", path);
+  /* We only want to add a single instance of event listener, and not each
+     time it's clicked. That's how we open a delicious can of worms 😀 */
+  $('#confirmDelete').one( 'click', function() {
     console.log(`you clicked ${userToken}!!`);
-    event.stopPropagation();
     /* 1. Create a reference to the db with the given userToken. and get its 
-            directory. */
+  
+              directory. */
     console.log(path);
     const target = ref(db, path);
     /* 2. Call the firebase remove() */
-    remove(target);
-    if (assigned === true) {
-      // If the user is assigned, then we must free the walkers as well.
-      // moveWalkerToAvail(userToken);
+    if (assigned === 'true'){
+      moveWalkerToAvail(userToken);
     }
+    remove(target);
+    
     document.querySelector("#cancelDelete").click();
-  });
 
+  })
 }
 
 
@@ -716,6 +722,7 @@ function moveToUnavailable(walkerToken, userToken) {
  * @function moveWalkerToAvail
  * @param {String} userToken 
  * @brief This function is used when an admin deletes an ongoing user. 
+ * 
  *        This means that we will not only remove the user from the pending 
  *        request in assignedUser but also move walkers from unavailableWalkers 
  *        to availableWalkers.
@@ -723,6 +730,7 @@ function moveToUnavailable(walkerToken, userToken) {
 function moveWalkerToAvail(userToken){
   let walker1, walker2;
   if (typeof globalUserData["pairs"][userToken][1] !== "undefined") {
+    console.log('hereee');
     walker1 = globalUserData["pairs"][userToken][1];
     deleteWalkerByToken(walker1.token, false, false);
     walker1.onWalk = false;
@@ -730,6 +738,9 @@ function moveWalkerToAvail(userToken){
     walker1.pairedWith.walkerPairToken = '';
     walker1.pairedWith.userToken ='';
     writeWalkerData(walker1);
+  }
+  else{
+    console.log('UNDEFINED WALKER1');
   }
   if (typeof globalUserData["pairs"][userToken][2] !== "undefined") {
     walker2 = globalUserData["pairs"][userToken][2];
@@ -742,7 +753,9 @@ function moveWalkerToAvail(userToken){
     walker2.pairedWith.userToken ='';
     writeWalkerData(walker2);
   }
-  
+  else{
+    console.log('UNDEFINED WALKER2');
+  }
 }
 
 /**
@@ -770,7 +783,7 @@ async function deleteWalkerByToken(walkerToken, available, deleted = true) {
     }/${walkerToken}`;
   console.log(path);
   remove(ref(db, path));
-  deleted ? alert("walker has been deleted!") : alert("walker has been moved!");
+  // deleted ? alert("walker has been deleted!") : alert("walker has been moved!");
 
 }
 
