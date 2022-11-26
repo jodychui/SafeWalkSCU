@@ -136,7 +136,7 @@ function initializeData() {
           globalUserData = {};
           clearAllTables();
         }
-      })
+      }})
       .catch((error) => {
         /* Promise has failed at this point, so it will throw an error.  */
         console.error(error);
@@ -200,7 +200,7 @@ function writeUserData(user) {
  * @function writeWalkerData
  * @param {walker} walker
  * @var assigned shows if user is assigned to a walker
- * @brief Takes user (walker) object and writes to the database in
+ * @brief Takes walker object and writes to the database in
  * database path `/walkers/<authorizationToken>`.
  * */
 function writeWalkerData(walker) {
@@ -295,6 +295,8 @@ async function main() {
     ],
     assigned: [false, false, false, true],
   };
+
+ 
   // let arr = [];
   // for (let i = 0; i < 2; i++) {
   //   let user1 = new user(
@@ -312,16 +314,18 @@ async function main() {
   //   arr.push(user1);
   //   writeUserData(user1);
   // }
-  // const walker1 = new walker(
-  //   "z",
-  //   "Xavier",
-  //   "Xav@scu.edu",
-  //   "714-324-3212",
-  //   true,
-  //   false,
-  //   "El Macho Blvd",
-  //   false
-  // );
+  const walker1 = new walker(
+    "z",
+    "Xavier",
+    "Xav@scu.edu",
+    "714-324-3212",
+    true,
+    false,
+    "El Macho Blvd",
+    false
+  );
+  //deleteWalkerByToken(walker1.token, true);
+
   // walker1.assigned = false;
   // userSetCheckInTime(walker1);
   // writeWalkerData(walker1);
@@ -686,10 +690,13 @@ function moveUserToAssigned(userToken) {
 }
 
 /**
- * @function moveToUnavailable
- * @param {String} walkerToken 
+ * @function 
+ * @param {String} walkerToken
+ * @brief Deletes the Walker information from the available section.
+ * Then changes onWalk = true and makes a copy of this 
+ * data to move into the unavailable section (which we will call later)
  */
-function moveToUnavailable(walkerToken) {
+function moveToUnavailable(walkerToken, userToken) {
   let newUnassignedWalker = globalUserData["availableWalkers"][walkerToken];
   if (typeof newUnassignedWalker === "undefined") {
     return;
@@ -699,6 +706,9 @@ function moveToUnavailable(walkerToken) {
   /* Copy the data to the new unavailable row. Change its status
      to 'unavailable.'*/
   newUnassignedWalker.onWalk = true; //change status of walker
+  newUnassignedWalker.available = false;
+  newUnassignedWalker.onDuty = true; //double check
+
   writeWalkerData(newUnassignedWalker); //update database of new status
 }
 
@@ -743,45 +753,20 @@ function moveWalkerToAvail(userToken){
  *        This means that we will move the user to assignedUsers and the two 
  *        associated walkers to unAvailableWalkers
  */
-function moveWalkerToUnavail(userToken) {
-  let walker1, walker2;
-  // CHECK ! go through availableWalkers & get first 2
-    walker1 = globalUserData["availableWalkers"][0];
-    walker2 = globalUserData["availableWalkers"][1];
+function moveWalkerToUnavail(walkerToken, rowNum) {
+  let newAssignedWalker = globalUserData["availableWalkers"][walkerToken];
 
-  if (typeof globalUserData["availableWalkers"][0] !== "undefined") {
-    walker1 = globalUserData["availableWalkers"][0];
-    moveToUnavailable(walker1);
-    walker1.onWalk = true;
-    walker1.onDuty = true;
-    // walker1.pairedWith.walkerPairToken = '';
-    walker1.pairedWith.userToken = userToken;
-    writeWalkerData(walker1);
-  }
-  if (typeof globalUserData["availableWalkers"][1] !== "undefined") {
-    walker2 = globalUserData["availableWalkers"][1];
-    moveToUnavailable(walker2);
-    walker2.onWalk = true;
-    walker2.onDuty = true;
-    walker2.pairedWith.walkerPairToken = walker1;
-    walker2.pairedWith.userToken = userToken;
-    writeWalkerData(walker2);
-  }
-
-  if(walker2!= null) {
-    walker1.pairedWith.walkerPairToken = walker2;
-  }
 
 }
 
 /**
  * 
  * @param {String} walkerToken 
- * @param {Boolean} available 
+ * @param {Boolean} available curr status
  * @param {Boolean} deleted 
  */
 async function deleteWalkerByToken(walkerToken, available, deleted = true) {
-  const path = `${available === "true" ? "availableWalkers" : "unavailableWalkers"
+  const path = `${Boolean(available) === true ? "availableWalkers" : "unavailableWalkers"
     }/${walkerToken}`;
   console.log(path);
   remove(ref(db, path));
