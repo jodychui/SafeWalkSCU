@@ -319,11 +319,13 @@ async function main() {
     "Xavier",
     "Xav@scu.edu",
     "714-324-3212",
-    true,
-    false,
+    true, //onDuty
+    false, //onWalk
     "El Macho Blvd",
-    false
+    false //completedWalk
   );
+    moveWalkerToUnavail(walker1.token,fields.userToken[0],0);
+    //walker1 token = z, usertoken = a, first row = 0
   //deleteWalkerByToken(walker1.token, true);
 
   // walker1.assigned = false;
@@ -519,7 +521,7 @@ async function deleteUserOnClick(e) {
     console.log(`you clicked ${userToken}!!`);
     /* 1. Create a reference to the db with the given userToken. and get its 
   
-              directory. */
+            directory. */
     console.log(path);
     const target = ref(db, path);
     /* 2. Call the firebase remove() */
@@ -702,7 +704,7 @@ function moveUserToAssigned(userToken) {
  * Then changes onWalk = true and makes a copy of this 
  * data to move into the unavailable section (which we will call later)
  */
-function moveToUnavailable(walkerToken, userToken) {
+function moveToUnavailable(walkerToken) {
   let newUnassignedWalker = globalUserData["availableWalkers"][walkerToken];
   if (typeof newUnassignedWalker === "undefined") {
     return;
@@ -714,7 +716,6 @@ function moveToUnavailable(walkerToken, userToken) {
   newUnassignedWalker.onWalk = true; //change status of walker
   newUnassignedWalker.available = false;
   newUnassignedWalker.onDuty = true; //double check
-
   writeWalkerData(newUnassignedWalker); //update database of new status
 }
 
@@ -739,9 +740,6 @@ function moveWalkerToAvail(userToken){
     walker1.pairedWith.userToken ='';
     writeWalkerData(walker1);
   }
-  else{
-    console.log('UNDEFINED WALKER1');
-  }
   if (typeof globalUserData["pairs"][userToken][2] !== "undefined") {
     walker2 = globalUserData["pairs"][userToken][2];
     deleteWalkerByToken(walker2.token, false, false);
@@ -761,15 +759,25 @@ function moveWalkerToAvail(userToken){
 /**
  * 
  * @function moveWalkerToUnavail
- * @param {String} userToken 
+ * @param {String} walkerToken 
+ * @param {String} userToken
+ * @param {String} rowNum starts from index 0-->n
  * @brief This function is used when an admin assigns a user to two walkers. 
  *        This means that we will move the user to assignedUsers and the two 
  *        associated walkers to unAvailableWalkers
  */
-function moveWalkerToUnavail(walkerToken, rowNum) {
-  let newAssignedWalker = globalUserData["availableWalkers"][walkerToken];
+function moveWalkerToUnavail(walkerToken, userToken, rowNum) {
+  //line 327 test
 
-
+  //reference
+  // var secondKey = Object.keys(something)[1]; //fetched the key at second index
+  // alert(something[secondKey ]);
+  let walker1, walker2, wi1, wi2;
+  let testKey;
+  wi1 = 2*rowNum; // get walker index num in db
+  testKey = Object.keys("availableWalkers")[wi1];
+  console.log("availableWalkers"[testKey]);//test if correct
+  //keeps printing a or u, not correct
 }
 
 /**
@@ -783,7 +791,7 @@ async function deleteWalkerByToken(walkerToken, available, deleted = true) {
     }/${walkerToken}`;
   console.log(path);
   remove(ref(db, path));
-  // deleted ? alert("walker has been deleted!") : alert("walker has been moved!");
+  deleted ? alert("walker has been deleted!") : alert("walker has been moved!");
 
 }
 
