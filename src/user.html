@@ -36,7 +36,7 @@
     </nav>
 
     <div class="row-content">
-        <div class="card w-75 border-secondary request-body text-center mx-auto" style="margin-top: 20px;">
+        <div class="card w-75 border-secondary text-center mx-auto" style="margin-top: 20px;">
             <div class="card-body">
                 <img class="card-img-top img-fluid" style="max-width: 20%;" src="assets/logos/logo_transparent.png"
                     alt="Safe Walk logo image">
@@ -48,32 +48,51 @@
                         <label class="control-label">Destination</label>
                         <input type="text" class="form-control" id="us3-address" />
                     </div>
+
                     <div class="form-group current-location">
                         <label class="control-label">Current Location</label>
                         <div class="w-100 d-none d-md-block"></div>
-                        <button onclick="getLocation()">Share Location</button>
-                        <p id="demo"></p>
+                        <button id="locationButton" type="button">Share Location</button>
+                        <div id="locationError"></div>
 
-                        <!-- Get user location - HTML Geolocation? -->
+                        <!-- HTML GEOLOCATION -->
+                        <!-- https://www.sanwebe.com/2016/04/get-current-location-of-user-using-jquery -->
                         <script>
-                            var x = document.getElementById("demo");
-
-                            function getLocation() {
-                                if (navigator.geolocation) {
-                                    navigator.geolocation.getCurrentPosition(showPosition);
+                            $("#locationButton").click(function () { //user clicks button
+                                if ("geolocation" in navigator) { //check geolocation available 
+                                    //try to get user current location using getCurrentPosition() method
+                                    navigator.geolocation.watchPosition(show_location, show_error, { timeout: 1000, enableHighAccuracy: true }); //position request
                                 } else {
-                                    x.innerHTML = "Geolocation is not supported by this browser.";
+                                    ("#locationError").html("Browser doesn't support geolocation!");
+                                }
+                            });
+
+                            //Success Callback
+                            function show_location(position) {
+                                $("#locationError").html("Your current location <br />Lat : " + position.coords.latitude + " </br>Lang :" + position.coords.longitude);
+                            }
+
+                            //Error Callback
+                            function show_error(error) {
+                                switch (error.code) {
+                                    case error.PERMISSION_DENIED:
+                                        alert("Permission denied by user.");
+                                        break;
+                                    case error.POSITION_UNAVAILABLE:
+                                        alert("Location position unavailable.");
+                                        break;
+                                    case error.TIMEOUT:
+                                        alert("Request timeout.");
+                                        break;
+                                    case error.UNKNOWN_ERROR:
+                                        alert("Unknown error.");
+                                        break;
                                 }
                             }
-
-                            function showPosition(position) {
-                                x.innerHTML = "Latitude: " + position.coords.latitude +
-                                    "<br>Longitude: " + position.coords.longitude;
-                            }
                         </script>
-
                     </div>
-                    <button type="submit" style="margin-top: 20px;" class="btn btn-primary">Submit</button>
+
+                    <input class="btn btn-dark" type="submit" style="margin-top: 20px;" value="Submit">
                 </form>
 
             </div>
