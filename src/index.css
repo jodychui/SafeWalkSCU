@@ -27,10 +27,3 @@ table {
 tbody {
     background-color: white;
 }
-
-.request-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 600px;
-}
