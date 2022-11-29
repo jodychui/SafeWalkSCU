@@ -372,9 +372,11 @@ async function main() {
   // walker1.assigned = false;
   // userSetCheckInTime(walker1);
   // writeWalkerData(walker1);
+
 //   setTimeout( ()=> {    moveWalkerToAvail('d');
 // }, 5000);
   setTableRefresh(1);
+
 
 }
 main();
@@ -518,8 +520,8 @@ function fillAssignPopup(data) {
   let i = 0, j = 0;
   let walker = Object.values(data); // array
   for (const tr of tbody.children) {
-    if ( j > 0){
-      for (const td of tr.children){
+    if (j > 0) {
+      for (const td of tr.children) {
         td.style['border-top'] = '1px solid #dee2e6';
       }
 
@@ -551,14 +553,13 @@ async function deleteUserOnClick(e) {
     e.currentTarget.parentNode.parentNode.getAttribute("userToken");
   const assigned =
     e.currentTarget.parentNode.parentNode.getAttribute("assignedUsers");
-  const path = `${
-    assigned === "true" ? "assignedUsers" : "unassignedUsers"
-  }/${userToken}`;
-  
+  const path = `${assigned === "true" ? "assignedUsers" : "unassignedUsers"
+    }/${userToken}`;
+
   console.log("path ", path);
   /* We only want to add a single instance of event listener, and not each
      time it's clicked. That's how we open a delicious can of worms 😀 */
-  $('#confirmDelete').one( 'click', function() {
+  $('#confirmDelete').one('click', function () {
     console.log(`you clicked ${userToken}!!`);
     /* 1. Create a reference to the db with the given userToken. and get its 
   
@@ -566,11 +567,11 @@ async function deleteUserOnClick(e) {
     console.log(path);
     const target = ref(db, path);
     /* 2. Call the firebase remove() */
-    if (assigned === 'true'){
+    if (assigned === 'true') {
       moveWalkerToAvail(userToken);
     }
     remove(target);
-    
+
     document.querySelector("#cancelDelete").click();
 
   })
@@ -746,7 +747,7 @@ function moveUserToAssigned(userToken) {
  *        request in assignedUser but also move walkers from unavailableWalkers 
  *        to availableWalkers.
  */
-function moveWalkerToAvail(userToken){
+function moveWalkerToAvail(userToken) {
   let walker1, walker2;
   if (typeof globalUserData["pairs"][userToken][1] !== "undefined") {
     console.log('hereee');
@@ -755,10 +756,10 @@ function moveWalkerToAvail(userToken){
     walker1.onWalk = false;
     walker1.onDuty = true;
     walker1.pairedWith.walkerPairToken = '';
-    walker1.pairedWith.userToken ='';
+    walker1.pairedWith.userToken = '';
     writeWalkerData(walker1);
   }
-  else{
+  else {
     console.log('UNDEFINED WALKER1');
   }
   if (typeof globalUserData["pairs"][userToken][2] !== "undefined") {
@@ -769,10 +770,10 @@ function moveWalkerToAvail(userToken){
     walker2.onDuty = true;
     walker2.onWalk = false;
     walker2.pairedWith.walkerPairToken = '';
-    walker2.pairedWith.userToken ='';
+    walker2.pairedWith.userToken = '';
     writeWalkerData(walker2);
   }
-  else{
+  else {
     console.log('UNDEFINED WALKER2');
   }
 }
@@ -995,7 +996,7 @@ function stringToJSON(data) {
  */
 function organizePair(globalUserObj) {
   if (typeof globalUserObj["unavailableWalkers"] !== "undefined"
-   && typeof globalUserObj['assignedUsers'] !== 'undefined' ) {
+    && typeof globalUserObj['assignedUsers'] !== 'undefined') {
     /* You must first create an object in pairs before you create an array
          per pair */
     let newPairLocation = (globalUserObj["pairs"] = {});
@@ -1048,5 +1049,8 @@ function setTableRefresh(rate) {
 $('#walkersPopUp').on('shown.bs.modal', function () {
   $('#myInput').trigger('focus')
 })
+
+/* //! ======================== HTML GEOLOCATION =========================  */
+// https://www.sanwebe.com/2016/04/get-current-location-of-user-using-jquery
 
 

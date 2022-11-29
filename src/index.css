@@ -18,11 +18,12 @@ body {
     /* width: auto; */
 }
 
+table {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 100%;
+}
+
 tbody {
     background-color: white;
 }
-
-.profile-pic-small {
-    max-width: 25%;
-}
-
