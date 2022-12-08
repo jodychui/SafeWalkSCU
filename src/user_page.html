@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Safe Walk Admin Dashboard</title>
+    <title>Safe Walk Request Dashboard</title>
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -32,15 +32,65 @@
     <![endif]-->
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="user.html">SafeWalkSCU</a>
-        <button class="btn btn-danger my-2 my-sm-0" type="submit">Update Profile</button>
+        <button class="btn btn-danger my-2 my-sm-0" data-toggle="modal" data-target="#userProfile">Update
+            Profile</button>
     </nav>
+
+    <!-- User Profile Modal -->
+    <div class="modal fade" id="userProfile" tabindex="-1" role="dialog" aria-labelledby="userProfileLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">User Profile</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputFirstName">First Name</label>
+                                <input type="text" class="form-control" id="inputName" placeholder="First Name">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputLastName">Last Name</label>
+                                <input type="text" class="form-control" id="inputLastName" placeholder="Last Name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputStudentID">Student ID #</label>
+                            <input type="text" class="form-control" id="inputStudentID" placeholder="1234567">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail">SCU Email</label>
+                            <input type="text" class="form-control" id="inputEmail" placeholder="email@scu.edu">
+                        </div>
+                        <div class="form-row">
+                            <label for="inputProfilePicture">Profile Picture</label>
+                            <div class="file-drop-area">
+                                <span class="choose-file-button">Choose file</span>
+                                <span class="file-message">or drag and drop here</span>
+                                <input class="file-input" type="file">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row-content">
         <div class="card w-75 border-secondary text-center mx-auto" style="margin-top: 20px;">
             <div class="card-body">
-                <img class="card-img-top img-fluid" style="max-width: 20%;" src="assets/logos/logo_transparent.png"
+                <img class="card-img-top img-fluid" style="max-width: 30%;" src="assets/logos/logo_transparent.png"
                     alt="Safe Walk logo image">
-                <h1 class="card-title">Create A New Request</h1>
+                <h3 class="card-title">Create A New Request</h3>
                 <p class="card-text">Request an escort</p>
 
                 <form>

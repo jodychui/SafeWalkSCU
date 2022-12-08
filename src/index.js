@@ -267,8 +267,8 @@ async function main() {
      until the data is completely retrieved. */
 
   let fields = {
-    userToken: ["a", "b", "c", "d"],
-    names: ["Jodi", "Marty", "Kristina", "Shamwow"],
+    userToken: ["ac", "bc", "cc", "dc"],
+    names: ["Jodi", "Marty", "Kristina", "Shamwowow"],
     emails: [
       "Jodi@scu.edu",
       "Marty@scu.edu",
@@ -297,43 +297,91 @@ async function main() {
   };
 
  
-  // let arr = [];
-  // for (let i = 0; i < 2; i++) {
-  //   let user1 = new user(
-  //     fields.userToken[i],
-  //     fields.names[i],
-  //     fields.emails[i],
-  //     fields.phoneNumbers[i],
-  //     fields.srcAddressL1[i],
-  //     "",
-  //     fields.dstAddressL1[i]
-  //   );
-  //   user1.assigned = fields.assigned[i];
-  //   userSetCheckInTime(user1);
+  let arr = [];
+  for (let i = 0; i < 4; i++) {
+    let user1 = new user(
+      fields.userToken[i],
+      fields.names[i],
+      fields.emails[i],
+      fields.phoneNumbers[i],
+      fields.srcAddressL1[i],
+      "",
+      fields.dstAddressL1[i]
+    );
+      if (i === 3){
+    user1.pairedWalkers.walker1Token = 'dca'
+      user1.pairedWalkers.walker2Token = 'dcb'
+    }
+    user1.assigned = fields.assigned[i];
+    userSetCheckInTime(user1);
 
-  //   arr.push(user1);
-  //   writeUserData(user1);
-  // }
-  const walker1 = new walker(
-    "z",
-    "Xavier",
-    "Xav@scu.edu",
-    "714-324-3212",
-    true, //onDuty
-    false, //onWalk
-    "El Macho Blvd",
-    false //completedWalk
-  );
-    moveWalkerToUnavail(walker1.token,fields.userToken[0],0);
-    //walker1 token = z, usertoken = a, first row = 0
-  //deleteWalkerByToken(walker1.token, true);
+    arr.push(user1);
+    writeUserData(user1);
+  }
+  let fieldsWalker = {
+    userToken: ["dca", "dcb", "dcc", "dcd"],
+    names: ["Ross", "Rachel", "Monica", "Chandler"],
+    emails: [
+      "Ross@scu.edu",
+      "Rachel@scu.edu",
+      "Monica@scu.edu",
+      "Chandler@scu.edu",
+    ],
+    phoneNumbers: [
+      "626-321-4212",
+      "503-421-2451",
+      "322-323-3543",
+      "434-434-4652",
+    ],
+    locations: [
+      "324 Villa Rd",
+      "322 Country Rd",
+      "523 New York Ave",
+      "242 Camino Rd",
+    ],
+    onDuty: [true, true, true, true],
+    onWalk: [true, true, false, false],
+    
+  };
+  let arr2 = [];
+  for (let i = 0; i < 4; i++) {
+    let walker1 = new walker(
+      fieldsWalker.userToken[i],
+      fieldsWalker.names[i],
+      fieldsWalker.emails[i],
+      fieldsWalker.phoneNumbers[i],
+      fieldsWalker.onDuty[i],
+      fieldsWalker.onWalk[i],
+      fieldsWalker.locations[i],
+      ""
+    );
+    if (i === 0 || i === 1 ){
+      walker1.pairedWith.userToken = 'dc';
+    }
 
+    arr2.push(walker1);
+    writeWalkerData(walker1);
+  }
+  
+  
+  // const walker1 = new walker(
+  //   "z",
+  //   "Xavier",
+  //   "Xav@scu.edu",
+  //   "714-324-3212",
+  //   true,
+  //   false,
+  //   "El Macho Blvd",
+  //   false
+  // );
   // walker1.assigned = false;
   // userSetCheckInTime(walker1);
   // writeWalkerData(walker1);
-  //   setTimeout( ()=> {    moveWalkerToAvail('d');
-  // }, 5000);
-  //   setTableRefresh(1);
+
+//   setTimeout( ()=> {    moveWalkerToAvail('d');
+// }, 5000);
+  setTableRefresh(1);
+
 
 }
 main();
