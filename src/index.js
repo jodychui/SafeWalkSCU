@@ -375,7 +375,7 @@ async function main() {
 
 //   setTimeout( ()=> {    moveWalkerToAvail('d');
 // }, 5000);
-  setTableRefresh(1);
+  // setTableRefresh(1);
 
 
 }
