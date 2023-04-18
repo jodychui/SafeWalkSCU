@@ -43,7 +43,7 @@ import {
   userSetCheckInTime,
   userSetCheckOutTime,
 } from "./classes.js";
-import { walker } from "./walker.js";
+import { walker } from "./classes.js";
 // import the walker object here!
 
 const firebaseConfig = {
